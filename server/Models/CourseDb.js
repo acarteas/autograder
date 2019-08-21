@@ -3,6 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 class CoursesDb {
    /**
     * CoursesDb constructor.
+    * @class
     * @param {*} db_connection The database connection. 
     */
    constructor(db_connection) {

@@ -4,6 +4,7 @@ class AssignmentFilesDb {
 
    /**
     * AssignmentFilesDb constructor.
+    * @class
     * @param {*} db_connection The database connection. 
     */
    constructor(db_connection) {
