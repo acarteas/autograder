@@ -103,19 +103,25 @@ exports.logout = function(req, res) {
       // using the access token
      const accessToken = response.data.access_token;
       getGithubUser(accessToken)
-      .then(user => validateUser(user, db))
-      .then(user => db.Users.userRow(user.login))
+      .catch(err => {
+         res.json({response: err}); 
+      })
+      .then(user => {
+         req.session.user = user; 
+         return db.Users.exists(user.login); 
+      })
+      .then(() => db.Users.userRow(req.session.user.login))
       .then(user => {
          req.session.user = user; 
          res.redirect(clientUrl + 'account/login');
       })
       .catch(err => {
-         res.json({response: err});
-      })
+         res.redirect(clientUrl + 'account/create');
+      });
    })
    .catch(err => {
       res.json({response: err}); 
-   })
+   });
 }
 
 /** 
@@ -167,32 +173,5 @@ exports.oldLogin = function(req, res, db){
    })
    .catch(err => {
       res.json({ response: err });
-   });
-}
-
-
-/**
- * Checks if a GitHub user exists in the DB. If not, adds the user 
- * to the DB.  
- * @param {Object} user JSON object representing a GitHub user.
- * @param {Object} db Database connection. 
- * @returns {Promise} Resolves with user object if user either already existed 
- *    or was successfully created; rejects with error otherwise. 
- */
-validateUser = function(user, db) {
-   return new Promise((resolve, reject) => {
-      // If the current Github user doesn't exist in the database, create user 
-      db.Users.exists(user.login)
-      .catch(() => {
-         // User doesn't exist in DB, so create an entry for them 
-         db.Users.create(user)
-         .catch(() => {
-            reject(false);
-         });
-      })
-      .then(() => db.Users.userRow(user.login))
-      .then(result => {
-         resolve(result);
-      })
    });
 }

@@ -18,7 +18,7 @@ const routes = [
       path: "/account/logout",
       component: Logout,
       strict_match: false
-   },
+   }
 ];
 
 export default routes;

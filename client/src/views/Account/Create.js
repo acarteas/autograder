@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Session from '../../view_models/Session.js';
-import User from '../../models/User.js';
+//import User from '../../models/User.js';
 import { connect } from "react-redux";
 import { updateUser } from '../../actions/index';
 import './Create.css';
@@ -23,13 +23,12 @@ class CreateView extends Component {
       this.session = Session;
       this.state = {
          email: "",
-         password: "",
          first_name: "",
          last_name: "",
          error_messages: ""
       };
-      this.user_manager = new User(this.props.config);
-      this.createAccount = this.createAccount.bind(this);
+      //this.user_manager = new User(this.props.config);
+      this.createProfile = this.createProfile.bind(this);
       this.handleInputChange = this.handleInputChange.bind(this);
    }
 
@@ -43,7 +42,8 @@ class CreateView extends Component {
       });
    }
 
-   createAccount(evt) {
+   //TODO
+   createProfile(evt) {
       evt.preventDefault();
       this.props.models.user.create(this.state)
          .then((user) => {
@@ -55,14 +55,13 @@ class CreateView extends Component {
    }
 
    render() {
-      const user_name = this.state.user_name;
-      const password = this.state.password;
+      const email = this.state.email;
       const last_name = this.state.last_name;
       const first_name = this.state.first_name;
       return (
          <article className="container">
-            <h1>Create an Account</h1>
-            <form className="" onSubmit={this.createAccount}>
+            <h1>Create a Profile</h1>
+            <form className="" onSubmit={this.createProfile}>
                <div className="form-group">
                   <label htmlFor="FirstNameTextBox">First Name</label>
                   <input
@@ -88,33 +87,22 @@ class CreateView extends Component {
                   />
                </div>
                <div className="form-group">
-                  <label htmlFor="UserNameTextBox">
+                  <label htmlFor="EmailTextBox">
                      Email
                   </label>
                   <input
                      type="text"
                      className="form-control"
-                     id="UserNameTextBox"
+                     id="EmailTextBox"
                      name="email"
-                     value={user_name}
+                     value={email}
                      onChange={this.handleInputChange}
                      placeholder=""
                   />
                </div>
-               <div className="form-group">
-                  <label htmlFor="PasswordTextBox">Password</label>
-                  <input
-                     type="password"
-                     className="form-control"
-                     id="PasswordTextBox"
-                     name="password"
-                     value={password}
-                     onChange={this.handleInputChange}
-                     placeholder=""
-                  />
-               </div>
-               <button id="SubmitButton" className="btn btn-outline-primary" type="submit">Create Account</button>
+               <button id="SubmitButton" className="btn btn-outline-primary" type="submit">Create Profile</button>
             </form>
+            <p>{this.state.error_messages}</p>
          </article >
       );
    }

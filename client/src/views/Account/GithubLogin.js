@@ -21,9 +21,10 @@ class GithubLoginView extends Component {
         super(props);
 
         this.state = {
-           has_courses: false, 
-           valid_login: false, 
-           redirect_path: "https://github.com/login/oauth/authorize?client_id=" + oauthconfig.client_id + "&redirect_uri=http://localhost:8080/api/user/oauth/"
+            has_profile: false,
+            has_courses: false, 
+            valid_login: false, 
+            redirect_path: "https://github.com/login/oauth/authorize?client_id=" + oauthconfig.client_id + "&redirect_uri=http://localhost:8080/api/user/oauth/"
         };
      }
 
@@ -33,11 +34,19 @@ class GithubLoginView extends Component {
             if (user.id !== undefined && user.id > 0)
             {
                this.props.updateUser(user); 
-            }
+            }  
             else
             {
                this.setState({valid_login: false});
                return Promise.reject('no user logged in'); 
+            }
+
+            // track whether this user needs to create their student profile
+            if(user.first_name == null || user.last_name == null || user.email == null) {
+               this.setState({has_profile: false});
+            }
+            else {
+               this.setState({has_profile: true}); 
             }
          })
          .then(() => this.props.models.course.getCoursesForUser(this.props.current_user.id))
@@ -63,23 +72,23 @@ class GithubLoginView extends Component {
 
    render() {
       // generate appropriate page based on whether a user is logged in-- 
-      // show login button if not already logged in, or show the user's 
-      // course/assignment page once logged in 
-      if(this.state.valid_login === true) 
-      {
-         if(this.state.has_courses === true) 
-         {
+      // show login button if not already logged in, direct to create profile if 
+      // they haven't yet, or show the user's course/assignment page once logged 
+      // in 
+      if(this.state.valid_login === true) {
+         if(this.state.has_profile === false) {
+            return(<Redirect to="/account/create" />); 
+         }
+         else if(this.state.has_courses === true) {
             // user has a course, so redirect to assignment page
             return(<Redirect to="/assignment" />);
          }
-         else
-         {
+         else {
             // user not enrolled in any courses-- let them choose one first 
             return(<Redirect to="/course" />);
          }
       }
-      else
-      {
+      else {
          return(<a href= {this.state.redirect_path} className = "btn btn-primary"> Login with Github </a>);
       }
    }
