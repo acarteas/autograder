@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { vs } from 'react-syntax-highlighter/dist/styles/hljs';
+//import { vs } from 'react-syntax-highlighter/dist/styles/hljs';
 
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
@@ -22,7 +22,7 @@ class SourceViewComponent extends Component {
          </div>
             <SyntaxHighlighter
                language="cpp"
-               style={vs}
+               
                showLineNumbers={true}
 
             >{source_file.contents}</SyntaxHighlighter>

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import './index.css';
 import { Link } from 'react-router-dom';
 
+
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
 };
@@ -21,6 +22,16 @@ class IndexView extends Component {
       this.courseButtonClick = this.courseButtonClick.bind(this);
       this.renderModifyLink = this.renderModifyLink.bind(this);
       this.renderAssignmentsLink = this.renderAssignmentsLink.bind(this);
+   }
+
+   async addCourseAsync() {
+      try {
+         console.log("trying...")
+         await this.props.models.course.addCourseAsync();
+         console.log("success");
+       } catch (e) {
+         console.log(e);
+       }
    }
 
    componentDidMount() {
@@ -160,7 +171,13 @@ class IndexView extends Component {
                <table className="table table-striped">
                   <thead>
                      <tr>
-                        <th scope="col"></th>
+                        <th scope="col">
+                           <button 
+                           className="btn btn-success" 
+                           onClick={() => self.addCourseAsync()}>
+                              +
+                           </button>
+                        </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
                         <th scope="col">Year</th>

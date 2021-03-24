@@ -39,6 +39,15 @@ class WebRequest {
          .then(callback);
    }
 
+   static async makePostAsync(url, post) {
+      const result = await axios(url, {
+         method: "post",
+         data: post,
+         withCredentials: true
+      })
+      return result;
+   }
+
    static makeDelete(url, data, callback){
       axios(url, {
          method: "delete",
