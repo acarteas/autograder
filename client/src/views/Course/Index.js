@@ -24,15 +24,13 @@ class IndexView extends Component {
       this.renderAssignmentsLink = this.renderAssignmentsLink.bind(this);
    }
 
-   async addCourseAsync() {
-      try {
-         console.log("trying...")
-         await this.props.models.course.addCourseAsync();
-         console.log("success");
-       } catch (e) {
-         console.log(e);
-       }
+   addCourseAsync() {
+         this.props.models.course.addCourseAsync()
+         .then(this.getCourses(this.props.current_user.id))
+         .catch(console.log);
    }
+
+   
 
    componentDidMount() {
       this.getCourses(this.props.current_user.id);
