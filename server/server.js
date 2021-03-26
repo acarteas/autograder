@@ -179,6 +179,9 @@ router.delete('/course/:course_id/user', (req, res) => courseRoute.removeUser(re
 // Adds the user to the specified course
 router.post('/course/:course_id/user', (req, res) => courseRoute.addUser(req, res, db, acl)); 
 
+// Sets the user's role
+router.post('/course/:course_id/user/set_role', (req, res) => courseRoute.setRole(req, res, db, acl));
+
 // Alters user's course role
 router.put('/course/:course_id/user', (req, res) => courseRoute.editRole(req, res, db, acl)); 
 

@@ -13,8 +13,7 @@ class SharedConfig{
    }
 
    constructRoute(path, params)
-   {
-      console.log(path);
+   {            
       let next_arg = 0; 
 
       // while there is still an unreplaced {parameter} in path
@@ -25,7 +24,6 @@ class SharedConfig{
          path = path.replace(regex, params[next_arg]);
          next_arg++; 
       }
-      console.log(path);
       return path; 
    }
 

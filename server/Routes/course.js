@@ -231,6 +231,37 @@ exports.editRole = function(req, res, db, acl) {
           res.json({ response: err })
        );
  }
+
+
+
+
+/** 
+  * Set's a user's course role.
+  * @param {Object} req HTTP request object. 
+  * @param {Object} res HTTP response object. 
+  * @param {Object} db Database connection. 
+  * @param {Object} acl Object containing AccessControlList methods. 
+  * @returns {Object} JSON response with number of database table rows affected
+  *   if successful, or with error message if unsuccessful for any reason. 
+  */
+ exports.setRole = function(req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.body.user_id;
+   const role = req.body.role;
+   let session = req.session;
+
+   acl.isLoggedIn(session)
+      .then(() => db.Courses.setCourseRole(course_id, user_id, role))
+      .then(
+         result => res.json({ response: result })
+      )
+      .catch(err =>
+         res.json({ response: err })
+      );
+}
+
+
+
  
 /** 
  * Returns all courses that the currently logged in user is taking.

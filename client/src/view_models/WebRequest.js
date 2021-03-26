@@ -65,6 +65,15 @@ class WebRequest {
       })
          .then(callback);
    }
+
+   static async makePutAsync(url, data) {
+      const result = await axios(url, {
+         method: "put",
+         data: data,
+         withCredentials: true
+      })
+      return result;
+   }
 }
 
 export { WebRequest };

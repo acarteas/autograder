@@ -24,10 +24,23 @@ class IndexView extends Component {
       this.renderAssignmentsLink = this.renderAssignmentsLink.bind(this);
    }
 
-   addCourseAsync() {
-         this.props.models.course.addCourseAsync()
-         .then(this.getCourses(this.props.current_user.id))
-         .catch(console.log);
+
+
+
+   async addCourseAsync() {
+
+      const testCourse = {
+         school_id: "1",
+         name: "CS 243",
+         term: "Spring",
+         year: "2021"
+      }
+
+      const user_id = this.props.current_user.id
+      await this.props.models.course.addCourseAsync(testCourse, user_id);
+      this.getCourses(user_id);
+    
+      
    }
 
    
@@ -113,7 +126,13 @@ class IndexView extends Component {
                <table className="table table-striped text-left">
                   <thead>
                      <tr>
-                        <th scope="col"></th>
+                        <th scope="col">
+                           <button 
+                              className="btn btn-success" 
+                              onClick={() => self.addCourseAsync()}>
+                                 +
+                           </button>
+                        </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
                         <th scope="col">Year</th>
@@ -170,11 +189,7 @@ class IndexView extends Component {
                   <thead>
                      <tr>
                         <th scope="col">
-                           <button 
-                           className="btn btn-success" 
-                           onClick={() => self.addCourseAsync()}>
-                              +
-                           </button>
+                           
                         </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
