@@ -78,6 +78,26 @@ class AccessControlList {
    }
 
    /**
+    * Resolves with true if the current user is an admin or instructor.
+    * @param {*} session Current session.
+    * @returns {Promise} Resolves to true if the user is an admin; rejects false otherwise.
+    */
+    isAdminOrInstructor(session) {
+      return new Promise((resolve, reject) => {
+         if (session.user !== undefined
+            && session.user !== null
+            && (session.user.is_admin === 1
+               || session.user.is_instructor === 1)
+         ) {
+            resolve(true);
+         }
+         else {
+            reject(false);
+         }
+      });
+   }
+
+   /**
     * Resolves with true if a user is currently logged into the session.
     * @param {*} session Current session. 
     * @returns {Promise} Resolves to true if someone is currently logged in; rejects false otherwise.

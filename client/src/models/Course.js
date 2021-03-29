@@ -13,12 +13,61 @@ class Course {
       this.getCoursesForUser = this.getCoursesForUser.bind(this);
       this.getActiveAssignmentsForCourse = this.getActiveAssignmentsForCourse.bind(this);
       this.addUser = this.addUser.bind(this);
+      this.addUserAsync = this.addUserAsync.bind(this);
       this.all = this.all.bind(this);
       this.removeUser = this.removeUser.bind(this);
       this.getCoursePrivileges = this.getCoursePrivileges.bind(this);
       this.getCoursePrivilegeNumber = this.getCoursePrivilegeNumber.bind(this);
+      this.addCourseAsync = this.addCourseAsync.bind(this);
    }
 
+
+   // Adds new course to the database, returns course_id of new course
+   async addCourseAsync(course, user_id) {
+      try {
+
+         // Create new course
+         const coursePath = this.config.endpoints.course.all;
+         const addCourseRequest = await WebRequest.makePostAsync(coursePath, course);
+         const courseId = addCourseRequest.data.response;
+
+         if (courseId !== false) {
+
+            // Construct endpoint to modify course priveleges
+            const courseUserPath = this.config.endpoints.course.course_user;
+            const courseUserEndpoint = this.config.constructRoute(courseUserPath, [courseId]);
+
+            // Add current user to new course
+            const addUserRequest = await WebRequest.makePostAsync(courseUserEndpoint, {
+               course_id: courseId,
+               user_id: user_id
+            })
+
+            // Set user role as 12 to allow management
+            const addCourseUserRequest = await WebRequest.makePostAsync(courseUserEndpoint + "/set_role", {
+               course_id: courseId,
+               user_id: user_id,
+               role: "12"
+            });
+
+         }
+      } catch (e) {
+         console.log(e);
+      }
+      
+      
+   }
+
+
+   // Async version of original addUser function
+   async addUserAsync(course_id, user_id) {
+      const path = this.config.endpoints.course.course_user;
+      const endpoint = this.config.constructRoute(path, [course_id]);
+      const result = await WebRequest.makePostAsync(endpoint, {user_id: user_id });
+      return result.data?.response;
+   }
+
+   // Adds the current user to the specified course
    addUser(course_id, user_id) {
       return new Promise((resolve, reject) => {
          let call = WebRequest.makePost;
@@ -36,6 +85,8 @@ class Course {
       });
    }
 
+
+   // Unsure what this function does
    all() {
       return new Promise((resolve, reject) => {
          let call = WebRequest.makeUrlRequest;
@@ -55,6 +106,7 @@ class Course {
          });
       });
    }
+
 
    getActiveAssignmentsForCourse(course_id) {
       return new Promise((resolve, reject) => {
