@@ -398,3 +398,8 @@ ASALocalRun/
 /server/oauthconfig.json
 client/src/oauthconfig.json
 server/oauthconfig.json
+/server/oauthconfig.json
+/client/src/oauthconfig.json
+/data/autograder_template.db
+/data/autograder_template.db
+/data/autograder.db
