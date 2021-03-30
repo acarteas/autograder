@@ -1,7 +1,13 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+-name: Create File
+  # You may pin to the exact commit or the version.
+  # uses: finnp/create-file-action@af8500fe0b0c5d8e04934f8bb62b9dda872c5803
+  uses: finnp/create-file-action@1.0.0
+  env:
+    FILE_NAME: "./client/src/oauthconfig.json"
+    FILE_DATA: "{"client_id": "12345", "client_secret": "12345"}"
+-name: Node.js CI
 
 on:
   push:
