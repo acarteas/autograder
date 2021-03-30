@@ -14,8 +14,8 @@ let create = false;
 const CourseTemplate = ({handleSubmission, props}) => {
 
    const [courseName, setCourseName] = React.useState("");
-   const [schoolId, setSchoolId] = React.useState("");
-   const [term, setTerm] = React.useState("");
+   const [schoolId, setSchoolId] = React.useState("1");
+   const [term, setTerm] = React.useState("Spring");
    const [year, setYear] = React.useState("");
 
 
@@ -35,16 +35,14 @@ const CourseTemplate = ({handleSubmission, props}) => {
          </td>
          <td>
             <input 
-               type="input" 
                placeholder="course name"
                onChange={e => setCourseName(e.target.value)}
             ></input>
          </td>
          <td>
-           <input 
-               placeholder="school id"
-               onChange={e => setSchoolId(e.target.value)}
-            ></input>
+           <select onChange={e => setSchoolId(e.target.value)}>
+              <option value="1">HSU</option>
+           </select>
          </td>
          <td>
             <input 
@@ -53,10 +51,11 @@ const CourseTemplate = ({handleSubmission, props}) => {
             ></input>
          </td>
          <td>
-            <input 
-               placeholder="term"
-               onChange={e => setTerm(e.target.value)}
-            ></input>
+         <select onChange={e => setTerm(e.target.value)}>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Fall">Fall</option>
+           </select>
          </td>
       </tr>
    );
