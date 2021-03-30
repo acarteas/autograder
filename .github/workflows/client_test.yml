@@ -1,8 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
-
+   
+name: Web Client CI
 on:
   push:
 
@@ -18,7 +17,7 @@ jobs:
     strategy:
       matrix:
 
-        node-version: [14.x, 15.x]
+        node-version: [14.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -28,9 +27,14 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - working-directory: ./client
       run: npm ci
-    - working-directory: ./client
-      run: npm run build 
+    - name: Create fake oauthconfig.json
+      uses: finnp/create-file-action@1.0.0
+      env:
+        FILE_NAME: "./client/src/oauthconfig.json"
+        FILE_DATA: "{}"
     - working-directory: ./client
       run: npm run build --if-present
+      env:
+        CI: false
     - working-directory: ./client
       run: npm test
