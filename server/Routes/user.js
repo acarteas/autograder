@@ -48,6 +48,7 @@ getGithubUser = function(token) {
          }
       })
       .then(response => {
+         console.log(response);
          resolve(response.data); 
       })
       .catch(err => {
