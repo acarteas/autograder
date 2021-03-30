@@ -94,7 +94,6 @@ class IndexView extends Component {
       */
       
       const user_id = parent.props.current_user.id;
-      console.log(user_id, course);
       await parent.props.models.course.addCourseAsync(course, user_id);
       parent.getCourses(user_id);
       create = false;
@@ -182,7 +181,6 @@ class IndexView extends Component {
       
       const toggleCreate = () => {
          create = !create;
-         console.log("done");
          this.getCourses(this.props.current_user.id);
       }
 

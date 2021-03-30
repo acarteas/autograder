@@ -191,7 +191,7 @@ exports.courses = function(req, res, db) {
     const year = req.body.year;
  
     // does the current user have permission to create courses? 
-    acl.isAdmin(session)
+    acl.isAdminOrInstructor(session)
     
        // is the course that this user wants to add unique? 
        .then(() => db.Courses.isUnique(school_id, name, term, year))

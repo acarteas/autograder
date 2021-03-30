@@ -26,7 +26,7 @@ class Course {
    async addCourseAsync(course, user_id) {
       try {
 
-         console.log(course);
+         
 
          // Create new course
          const coursePath = this.config.endpoints.course.all;
