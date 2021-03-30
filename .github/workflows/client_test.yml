@@ -20,11 +20,6 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - name: Create File
-      uses: finnp/create-file-action@1.0.0
-      env:
-        FILE_NAME: "./client/src/oauthconfig.json"
-        FILE_DATA: "{'client_id': '12345', 'client_secret': '12345'}"
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -32,6 +27,11 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - working-directory: ./client
       run: npm ci
+    - name: Create File
+      uses: finnp/create-file-action@1.0.0
+      env:
+        FILE_NAME: "./client/src/oauthconfig.json"
+        FILE_DATA: "{'client_id': '12345', 'client_secret': '12345'}"
     - working-directory: ./client
       run: npm run build --if-present
       env:
