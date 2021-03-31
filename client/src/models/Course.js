@@ -26,6 +26,8 @@ class Course {
    async addCourseAsync(course, user_id) {
       try {
 
+         
+
          // Create new course
          const coursePath = this.config.endpoints.course.all;
          const addCourseRequest = await WebRequest.makePostAsync(coursePath, course);

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-//right click context menu
-import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+
 
 //view models
 import Session from './view_models/Session.js';
