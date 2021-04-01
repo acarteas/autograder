@@ -192,12 +192,16 @@ class IndexView extends Component {
                   <thead>
                      <tr>
                         <th scope="col">
-                           <button
+                           {
+                              ((this.props.current_user.is_instructor === 1)
+                              || (this.props.current_user.is_admin === 1))
+                              && <button
                               className={(create) ? "btn btn-danger" : "btn btn-success"}
                               onClick={toggleCreate}
                               >
                               {(create) ? "X" : "+"}
-                           </button>
+                              </button>
+                           }
                         </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
