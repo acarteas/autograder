@@ -4,63 +4,35 @@ import './index.css';
 import { Link } from 'react-router-dom';
 
 
+import Course from '../../models/Course';
+
+
+
+const studentUser = {
+    id: 1,
+    is_account_pending: 0,
+    is_admin: 0,
+    is_instructor: 0,
+    last_login: null,
+    login: "student",
+    name: "Student",
+    password: null,
+    verification_key: null,
+    verification_key_date: "2021-03-18 20:50:05"
+}
+
+const models = {
+    course: Course
+}
+
+
+
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
 };
 
 
 let create = false;
-
-const CourseTemplate = ({handleSubmission, props}) => {
-
-   const [courseName, setCourseName] = React.useState("");
-   const [schoolId, setSchoolId] = React.useState("1");
-   const [term, setTerm] = React.useState("Spring");
-   const [year, setYear] = React.useState("");
-
-
-
-   return (
-      <tr>
-         <td>
-            <button 
-               className="btn btn-primary" 
-               onClick={() => handleSubmission({
-                  school_id: schoolId,
-                  name: courseName,
-                  term: term,
-                  year: year
-               }, props)}
-               >Submit</button> 
-         </td>
-         <td>
-            <input 
-               placeholder="course name"
-               onChange={e => setCourseName(e.target.value)}
-            ></input>
-         </td>
-         <td>
-           <select onChange={e => setSchoolId(e.target.value)}>
-              <option value="1">HSU</option>
-           </select>
-         </td>
-         <td>
-            <input 
-               placeholder="year"
-               onChange={e => setYear(e.target.value)}
-            ></input>
-         </td>
-         <td>
-         <select onChange={e => setTerm(e.target.value)}>
-              <option value="Spring">Spring</option>
-              <option value="Summer">Summer</option>
-              <option value="Fall">Fall</option>
-           </select>
-         </td>
-      </tr>
-   );
-};
-
 
 
 class IndexView extends Component {
@@ -81,18 +53,8 @@ class IndexView extends Component {
 
 
    
-
-   async addCourseAsync(course, parent) {
-
-      /*
-      const testCourse = {
-         school_id: "1",
-         name: "CS 243",
-         term: "Spring",
-         year: "2021"
-      }
-      */
-      
+   // Add the new course to the database
+   async addCourseAsync(course, parent) {      
       const user_id = parent.props.current_user.id;
       await parent.props.models.course.addCourseAsync(course, user_id);
       parent.getCourses(user_id);
@@ -306,6 +268,58 @@ class IndexView extends Component {
       );
    }
 }
+
+
+
+// Course template to be filled out by creator
+const CourseTemplate = ({handleSubmission, props}) => {
+   const [courseName, setCourseName] = React.useState("");
+   const [schoolId, setSchoolId] = React.useState("1");
+   const [term, setTerm] = React.useState("Spring");
+   const [year, setYear] = React.useState("");
+   
+   return (
+      <tr>
+         <td>
+            <button 
+               className="btn btn-primary" 
+               onClick={() => handleSubmission({
+                  school_id: schoolId,
+                  name: courseName,
+                  term: term,
+                  year: year
+               }, props)}
+               >Submit</button> 
+         </td>
+         <td>
+            <input 
+               placeholder="course name"
+               onChange={e => setCourseName(e.target.value)}
+            ></input>
+         </td>
+         <td>
+           <select onChange={e => setSchoolId(e.target.value)}>
+              <option value="1">HSU</option>
+           </select>
+         </td>
+         <td>
+            <input 
+               placeholder="year"
+               onChange={e => setYear(e.target.value)}
+            ></input>
+         </td>
+         <td>
+         <select onChange={e => setTerm(e.target.value)}>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Fall">Fall</option>
+           </select>
+         </td>
+      </tr>
+   );
+};
+
+
 
 const Index = connect(mapStateToProps)(IndexView);
 export { Index };
