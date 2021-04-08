@@ -25,38 +25,15 @@ class Course {
    // Adds new course to the database, returns course_id of new course
    async addCourseAsync(course, user_id) {
       try {
-
-         
-
          // Create new course
          const coursePath = this.config.endpoints.course.all;
          const addCourseRequest = await WebRequest.makePostAsync(coursePath, course);
          const courseId = addCourseRequest.data.response;
-
-         if (courseId !== false) {
-
-            // Construct endpoint to modify course priveleges
-            const courseUserPath = this.config.endpoints.course.course_user;
-            const courseUserEndpoint = this.config.constructRoute(courseUserPath, [courseId]);
-
-            // Add current user to new course
-            const addUserRequest = await WebRequest.makePostAsync(courseUserEndpoint, {
-               course_id: courseId,
-               user_id: user_id
-            })
-
-            // Set user role as 12 to allow management
-            const addCourseUserRequest = await WebRequest.makePostAsync(courseUserEndpoint + "/set_role", {
-               course_id: courseId,
-               user_id: user_id,
-               role: "12"
-            });
-
-         }
-      } catch (e) {
+         return courseId;
+      } 
+      catch (e) {
          console.log(e);
       }
-      
       
    }
 
