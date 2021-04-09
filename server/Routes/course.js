@@ -200,7 +200,7 @@ exports.createCourse = function (req, res, db, acl) {
       .then(
          result => {
             db.Courses.addUser(result, session.user.id);
-            db.Courses.setCourseRole(result, session.user.id, 12);
+            db.Courses.setCourseRole(result, session.user.id, 20);
             return res.json({ response: result });
          }
          

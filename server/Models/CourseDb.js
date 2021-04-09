@@ -195,6 +195,35 @@ class CoursesDb {
       });
    }
 
+
+   /**
+    * Returns true if the given user is the creator of this course.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the user is the creator of this course;
+    *    rejects otherwise.
+    */
+    isCreator(course_id, user_id) {
+      return new Promise((resolve, reject) => {
+         const sql = "SELECT * FROM course_users "
+            + "WHERE course_id = $course_id AND user_id = $user_id AND course_role & 16 > 0";
+         const params = { $course_id: course_id, $user_id: user_id }
+         this.db.get(sql, params, (err, row) => {
+            if (err === null && row !== undefined) {
+               resolve(true);
+            }
+            else if (err !== null) {
+               console.log(err);
+               reject(err);
+            }
+            else
+            {
+               reject(false);
+            }
+         });
+      });
+   }
+
    /**
     * Returns all users associated with a course.
     * @param {Number} course_id The course's ID number (integer).
@@ -311,34 +340,54 @@ class CoursesDb {
     * @param {Number} course_id The course's ID number (integer).
     * @param {Number} user_id The user's ID number (integer).
     * @param {Number} role Integer representing a role, specified by these bits: 
-    *    0001 = is pending user, 
-    *    0010 = can submit assignment,
-    *    0100 = can modify course,
-    *    1000 = can grade assignments
+    *    00001 = is pending user, 
+    *    00010 = can submit assignment,
+    *    00100 = can modify course,
+    *    01000 = can grade assignments,
+    *    10000 = is creator
     * @returns {Promise} Resolves with the number of rows affected if successful; 
     *    rejects with error otherwise. 
     */
    setCourseRole(course_id, user_id, role){
-      const sql = "UPDATE course_users SET course_role = $role WHERE course_id = $course_id AND user_id = $user_id";
-      const params = { $course_id: course_id, $user_id: user_id, $role: role }
 
-      return new Promise((resolve, reject) => {
+      // Prevent creator from being locked out of own course
+      const promise = this.isCreator(course_id, user_id)
+      .then(result => {
+         if (result && (role<20)) {
+            throw "CANNOT REMOVE PRIVELEGES FROM COURSE OWNER";
+         }
+      })
+      .catch(err => {
+         role = 20;
+         console.log(err);
+      })
+      .then(() => {
 
-         //AC: placing db callback function into its own variable changes 
-         //*this* from local class object to result of sqlite3 db call.
-         var local_callback = function (err) {
-            if (err === null) {
-               resolve(this.changes);
-               return;
-            }
-            else {
-               console.log(err);
-               reject(err);
-               return;
-            }
-         };
-         this.db.run(sql, params, local_callback);
-      });
+         
+         const sql = "UPDATE course_users SET course_role = $role WHERE course_id = $course_id AND user_id = $user_id";
+         const params = { $course_id: course_id, $user_id: user_id, $role: role }
+
+         return new Promise((resolve, reject) => {
+
+            //AC: placing db callback function into its own variable changes 
+            //*this* from local class object to result of sqlite3 db call.
+            var local_callback = function (err) {
+               if (err === null) {
+                  resolve(this.changes);
+                  return;
+               }
+               else {
+                  console.log(err);
+                  reject(err);
+                  return;
+               }
+            };
+            this.db.run(sql, params, local_callback);
+         });
+      })
+      .catch(console.log);
+
+      return promise;
    }
 }
 
