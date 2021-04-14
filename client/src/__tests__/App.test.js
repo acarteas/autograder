@@ -1,12 +1,10 @@
 import React from 'react';
-import { configureStore } from '@reduxjs/toolkit';
 import {render, screen} from "@testing-library/react";
+import userEvent from '@testing-library/user-event'
 
 
-import {Index} from '../views/Course/Index';
-import Course from '../models/Course';
-import { Provider } from "react-redux";
-import store from "../store/index";
+import {IndexView} from '../views/Course/Index';
+import CourseMock from '../models/CourseMock';
 import '@testing-library/jest-dom';
 
 
@@ -51,7 +49,7 @@ const adminUser = {
 }
 
 const models = {
-    course: Course
+    course: new CourseMock()
 }
 
 
@@ -60,26 +58,10 @@ const models = {
 // Course Test Suite
 describe('Course', () => {
 
+    console.log("MODELS ", models);
     test('renders student view properly', () => {
         render(
-        <Provider store={store}>
-          <Index current_user={studentUser} models={models} />  
-        </Provider>
-        );
-
-        screen.debug();
-
-        expect(screen.getByText('Available Courses')).toBeInTheDocument();
-        expect(screen.getByText('My Courses')).toBeInTheDocument();
-
-        expect(document.getElementById('createNewCourseButton')).toBeFalsy();
-    });
-
-    test('renders instructor view properly', () => {
-        render(
-        <Provider store={store}>
-          <Index current_user={instructorUser} models={models} />  
-        </Provider>
+            <IndexView current_user={studentUser} models={models}/>
         );
 
         screen.debug();
@@ -89,13 +71,28 @@ describe('Course', () => {
         
         expect(document.getElementById('createNewCourseButton')).toBeFalsy();
     });
+
+
+
+    test('renders instructor view properly', () => {
+        render(
+            <IndexView current_user={instructorUser} models={models}/>
+        );
+
+        screen.debug();
+
+        expect(screen.getByText('Available Courses')).toBeInTheDocument();
+        expect(screen.getByText('My Courses')).toBeInTheDocument();
+        
+        expect(document.getElementById('createNewCourseButton')).toBeTruthy();
+    });
+
+
 
 
     test('renders admin view properly', () => {
         render(
-        <Provider store={store}>
-          <Index current_user={studentUser} models={models} />  
-        </Provider>
+            <IndexView current_user={adminUser} models={models}/>
         );
 
         screen.debug();
@@ -103,7 +100,8 @@ describe('Course', () => {
         expect(screen.getByText('Available Courses')).toBeInTheDocument();
         expect(screen.getByText('My Courses')).toBeInTheDocument();
         
-        expect(document.getElementById('createNewCourseButton')).toBeFalsy();
+        expect(document.getElementById('createNewCourseButton')).toBeTruthy();
     });
 })
+
 

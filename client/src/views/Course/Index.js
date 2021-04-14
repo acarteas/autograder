@@ -4,28 +4,6 @@ import './index.css';
 import { Link } from 'react-router-dom';
 
 
-import Course from '../../models/Course';
-
-
-
-const studentUser = {
-    id: 1,
-    is_account_pending: 0,
-    is_admin: 0,
-    is_instructor: 0,
-    last_login: null,
-    login: "student",
-    name: "Student",
-    password: null,
-    verification_key: null,
-    verification_key_date: "2021-03-18 20:50:05"
-}
-
-const models = {
-    course: Course
-}
-
-
 
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
@@ -141,6 +119,7 @@ class IndexView extends Component {
       const self = this;
 
       
+      
       const toggleCreate = () => {
          create = !create;
          this.getCourses(this.props.current_user.id);
@@ -160,6 +139,7 @@ class IndexView extends Component {
                               && <button
                               className={(create) ? "btn btn-danger" : "btn btn-success"}
                               onClick={toggleCreate}
+                              id="createNewCourseButton"
                               >
                               {(create) ? "X" : "+"}
                               </button>
@@ -322,5 +302,5 @@ const CourseTemplate = ({handleSubmission, props}) => {
 
 
 const Index = connect(mapStateToProps)(IndexView);
-export { Index };
+export { Index, IndexView };
 export default Index;
