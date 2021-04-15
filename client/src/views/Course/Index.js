@@ -85,7 +85,9 @@ class IndexView extends Component {
             return new Promise(resolve => this.setState({ enrolled_courses: courses }, resolve));
          })
          .then(() => this.props.models.course.all())
-         .then(result => this.setState({ all_courses: result }))
+         .then(result => {
+            this.setState({ all_courses: result })
+         })
          .catch((err) => { });
    }
 
@@ -261,7 +263,8 @@ const CourseTemplate = ({handleSubmission, props}) => {
    return (
       <tr>
          <td>
-            <button 
+            <button
+               id='submitNewCourseButton' 
                className="btn btn-primary" 
                onClick={() => handleSubmission({
                   school_id: schoolId,
@@ -302,5 +305,5 @@ const CourseTemplate = ({handleSubmission, props}) => {
 
 
 const Index = connect(mapStateToProps)(IndexView);
-export { Index, IndexView };
+export { Index, IndexView, CourseTemplate };
 export default Index;

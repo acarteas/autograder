@@ -1,9 +1,9 @@
 import React from 'react';
-import {render, screen} from "@testing-library/react";
-import userEvent from '@testing-library/user-event'
+import {render, screen, fireEvent} from "@testing-library/react";
 
 
-import {IndexView} from '../views/Course/Index';
+
+import {IndexView, CourseTemplate} from '../views/Course/Index';
 import CourseMock from '../models/CourseMock';
 import '@testing-library/jest-dom';
 
@@ -53,55 +53,122 @@ const models = {
 }
 
 
+// Tests that Admin view of My Courses page works properly
+describe('Student View of My Courses', () => {
 
-
-// Course Test Suite
-describe('Course', () => {
-
-    console.log("MODELS ", models);
-    test('renders student view properly', () => {
-        render(
-            <IndexView current_user={studentUser} models={models}/>
-        );
-
-        screen.debug();
+    test('renders basic layout properly', () => {
+        render(<IndexView current_user={studentUser} models={models}/>);
 
         expect(screen.getByText('Available Courses')).toBeInTheDocument();
         expect(screen.getByText('My Courses')).toBeInTheDocument();
+    })
+
+
+    test('does not render "add course" button', () => {
+        render(<IndexView current_user={studentUser} models={models}/>);
         
         expect(document.getElementById('createNewCourseButton')).toBeFalsy();
-    });
+    })
+
+})
 
 
+// Tests that Admin view of My Courses page works properly
+describe('Instructor View of My Courses', () => {
 
-    test('renders instructor view properly', () => {
-        render(
-            <IndexView current_user={instructorUser} models={models}/>
-        );
-
-        screen.debug();
-
-        expect(screen.getByText('Available Courses')).toBeInTheDocument();
-        expect(screen.getByText('My Courses')).toBeInTheDocument();
-        
-        expect(document.getElementById('createNewCourseButton')).toBeTruthy();
-    });
-
-
-
-
-    test('renders admin view properly', () => {
-        render(
-            <IndexView current_user={adminUser} models={models}/>
-        );
-
-        screen.debug();
+    test('renders basic layout properly', () => {
+        render(<IndexView current_user={instructorUser} models={models}/>);
 
         expect(screen.getByText('Available Courses')).toBeInTheDocument();
         expect(screen.getByText('My Courses')).toBeInTheDocument();
+    })
+
+
+    test('renders "add course" button', () => {
+        render(<IndexView current_user={instructorUser} models={models}/>);
         
-        expect(document.getElementById('createNewCourseButton')).toBeTruthy();
-    });
+        expect(document.getElementById('createNewCourseButton')).toBeInTheDocument();
+    })
+
+
+    test('clicking "add course" button creates template', () => {
+        render(<IndexView current_user={instructorUser} models={models}/>);
+        fireEvent.click(document.getElementById('createNewCourseButton'));
+        
+        render(<IndexView current_user={instructorUser} models={models}/>);
+        expect(screen.getByText('Submit')).toBeInTheDocument();
+    })
+
+})
+
+
+// Tests that Admin view of My Courses page works properly
+describe('Adimin View of My Courses', () => {
+
+    test('renders basic layout properly', () => {
+        render(<IndexView current_user={adminUser} models={models}/>);
+
+        expect(screen.getByText('Available Courses')).toBeInTheDocument();
+        expect(screen.getByText('My Courses')).toBeInTheDocument();
+    })
+
+
+    test('renders "add course" button', () => {
+        render(<IndexView current_user={adminUser} models={models}/>);
+        
+        expect(document.getElementById('createNewCourseButton')).toBeInTheDocument();
+    })
+
+
+    test('clicking "add course" button creates template', () => {
+        render(<IndexView current_user={adminUser} models={models}/>);
+        fireEvent.click(document.getElementById('createNewCourseButton'));
+        
+        render(<IndexView current_user={adminUser} models={models}/>);
+        expect(screen.getByText('Submit')).toBeInTheDocument();
+    })
+
+})
+
+
+// Tests for Course Template Component
+describe('Course Template', () => {
+
+    test('renders component properly', () => {
+        const handleSubmission = jest.fn();
+
+        render(
+            <table>
+                <tbody>
+                    <CourseTemplate handleSubmission={handleSubmission} props="" />
+                </tbody>
+            </table>
+        );
+
+        expect(screen.getByRole('button')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText("course name")).toBeInTheDocument();
+        expect(screen.getByText('HSU')).toBeInTheDocument();
+        expect(screen.getByText('Spring')).toBeInTheDocument();
+    }) 
+
+
+    test('handleSubmission is called when "Submit" is clicked', () => {
+        const handleSubmission = jest.fn();
+
+        render(
+            <table>
+                <tbody>
+                    <CourseTemplate handleSubmission={handleSubmission} props="" />
+                </tbody>
+            </table>
+        );
+
+        const button = screen.getByRole('button');
+
+        fireEvent.click(button);
+
+        expect(handleSubmission).toHaveBeenCalledTimes(1);
+    }) 
 })
 
 
