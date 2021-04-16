@@ -76,7 +76,6 @@ class Course {
          const endpoint = this.config.constructRoute(path, []);
          call(endpoint, (result) => {
             if (result !== null && result !== undefined && result.data.response !== undefined) {
-               console.log(result.data.response);
                resolve(result.data.response);
             }
             else {
