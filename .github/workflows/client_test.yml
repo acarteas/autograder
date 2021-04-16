@@ -37,4 +37,4 @@ jobs:
       env:
         CI: false
     - working-directory: ./client
-      run: npm test
+      run: npm test -- Courses.test.js
