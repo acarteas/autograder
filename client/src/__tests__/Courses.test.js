@@ -55,7 +55,7 @@ const models = {
 }
 
 
-// Tests that Admin view of My Courses page works properly
+// Tests that Student view of My Courses page works properly
 describe('Student View of My Courses', () => {
 
     test('renders basic layout properly', () => {
@@ -82,12 +82,13 @@ describe('Student View of My Courses', () => {
         await act(() => promise);
         
         expect(screen.getByText("CS 211")).toBeInTheDocument();
+        expect(screen.getByText("Add")).toBeInTheDocument();
     })
 
 })
 
 
-// Tests that Admin view of My Courses page works properly
+// Tests that Instructor view of My Courses page works properly
 describe('Instructor View of My Courses', () => {
 
     test('renders basic layout properly', () => {
@@ -121,6 +122,7 @@ describe('Instructor View of My Courses', () => {
         await act(() => promise);
         
         expect(screen.getByText("CS 211")).toBeInTheDocument();
+        expect(screen.getByText("Add")).toBeInTheDocument();
     })
 
 })
@@ -158,8 +160,6 @@ describe('Adimin View of My Courses', () => {
         render(<IndexView current_user={studentUser} models={models}/>);
 
         await act(() => promise);
-
-        screen.debug();
         
         expect(screen.getByText("CS 211")).toBeInTheDocument();
         expect(screen.getByText("Add")).toBeInTheDocument();
@@ -168,7 +168,7 @@ describe('Adimin View of My Courses', () => {
 })
 
 
-// Tests for Course Template Component
+// Test "Course Template" Component
 describe('Course Template', () => {
 
     test('renders component properly', () => {
