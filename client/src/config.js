@@ -13,7 +13,7 @@ class SharedConfig{
    }
 
    constructRoute(path, params)
-   {
+   {            
       let next_arg = 0; 
 
       // while there is still an unreplaced {parameter} in path

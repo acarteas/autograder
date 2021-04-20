@@ -70,7 +70,7 @@ class GithubLoginView extends Component {
          if(this.state.has_courses === true) 
          {
             // user has a course, so redirect to assignment page
-            return(<Redirect to="/assignment" />);
+            return(<Redirect to="/" />);
          }
          else
          {
