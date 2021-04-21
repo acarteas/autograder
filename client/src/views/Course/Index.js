@@ -21,6 +21,7 @@ class IndexView extends Component {
       this.state = {
          all_courses: [],
          enrolled_courses: {},
+         archived_courses: {}
       };
 
       this.getCourses = this.getCourses.bind(this);
@@ -79,10 +80,16 @@ class IndexView extends Component {
       this.props.models.course.getCoursesForUser(user_id)
          .then(result => {
             let courses = {};
+            let archived = {};
             for (let course of result) {
-               courses[course.id] = course;
+               if (course.is_active) {
+                  courses[course.id] = course;
+               }
+               else {
+                  archived[course.id] = course;
+               }
             }
-            return new Promise(resolve => this.setState({ enrolled_courses: courses }, resolve));
+            return new Promise(resolve => this.setState({ enrolled_courses: courses, archived_courses: archived }, resolve));
          })
          .then(() => this.props.models.course.all())
          .then(result => {
@@ -118,7 +125,10 @@ class IndexView extends Component {
    render() {
       const all_courses = this.state.all_courses;
       const enrolled_courses = this.state.enrolled_courses;
+      const archived_courses = this.state.archived_courses;
       const self = this;
+
+      console.log(this.state.archived_courses);
 
       
       
@@ -172,7 +182,7 @@ class IndexView extends Component {
                         return (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button>
+                                 <button className="btn btn-primary" data-id={value.id} onClick={""}>Archive</button>
                                  &nbsp;
                                  {this.renderModifyLink(is_instructor, value.id)}
                                  &nbsp;
@@ -202,7 +212,7 @@ class IndexView extends Component {
                </table>
             </article>
             <article>
-               <h1>Available Courses</h1>
+               <h1>{(this.props.current_user.is_instructor) ? "Archived Courses" : "Available Courses"}</h1>
                <table className="table table-striped">
                   <thead>
                      <tr>
@@ -217,15 +227,25 @@ class IndexView extends Component {
                   </thead>
                   <tbody>
                      {all_courses.reduce((result, course) => {
-                        if (enrolled_courses[course.id] === undefined) {
-                           result.push(course)
+                        if (this.props.current_user.is_instructor){
+                           if (archived_courses[course.id] !== undefined) {
+                              result.push(course);
+                           }
                         }
+                        else {
+                           if (enrolled_courses[course.id] === undefined) {
+                              result.push(course)
+                           }
+                        }
+                        console.log(all_courses);
                         return result;
-                     }, []).map((value, index) => {
-                        return (
+                     }, []).map((value, index) => (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>
+                                 {!this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>}
+                                 {this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={""}>Reinstate</button>}
+                                 &nbsp;
+                                 {this.props.current_user.is_instructor && <button className="btn btn-danger" data-id={value.id} onClick={""}>Delete</button>}
                               </td>
                               <td>
                                  {value.name}
@@ -241,7 +261,6 @@ class IndexView extends Component {
                               </td>
                            </tr>
                         )
-                     }
                      )}
                   </tbody>
                </table>

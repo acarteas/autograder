@@ -86,7 +86,7 @@ class CoursesDb {
       return new Promise((resolve, reject) => { 
          let sql = "SELECT c.*, s.name AS school_name, s.acronym  FROM courses c INNER JOIN schools s ON c.school_id = s.id";
          if (include_deleted === false) {
-            sql += " WHERE is_deleted = 0 AND is_active = 1";
+            sql += " WHERE is_deleted = 0";
          }
          sql += " ORDER BY c.year, c.term DESC";
          this.db.all(sql, {}, (err, rows) => {
