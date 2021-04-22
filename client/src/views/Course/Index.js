@@ -42,6 +42,21 @@ class IndexView extends Component {
 
 
 
+   async archiveCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.archiveCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+   async reinstateCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.reinstateCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+
    componentDidMount() {
       this.getCourses(this.props.current_user.id);
    }
@@ -182,7 +197,7 @@ class IndexView extends Component {
                         return (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={""}>Archive</button>
+                                 <button className="btn btn-primary" data-id={value.id} onClick={() => this.archiveCourse(value.id)}>Archive</button>
                                  &nbsp;
                                  {this.renderModifyLink(is_instructor, value.id)}
                                  &nbsp;
@@ -243,7 +258,7 @@ class IndexView extends Component {
                            <tr key={value.id}>
                               <td>
                                  {!this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>}
-                                 {this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={""}>Reinstate</button>}
+                                 {this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>}
                                  &nbsp;
                                  {this.props.current_user.is_instructor && <button className="btn btn-danger" data-id={value.id} onClick={""}>Delete</button>}
                               </td>

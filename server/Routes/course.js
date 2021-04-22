@@ -237,6 +237,34 @@ exports.editRole = function (req, res, db, acl) {
 }
 
 
+exports.archiveCourse = async function (req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.body.user_id;
+   
+   try {
+      const result = await db.Courses.archive(course_id, user_id);
+      return res.json({response: result});
+   } catch (err) {
+      return res.json({response: err});
+   }
+
+}
+
+
+exports.reinstateCourse = async function (req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.body.user_id;
+   
+   try {
+      const result = await db.Courses.reinstate(course_id, user_id);
+      return res.json({response: result});
+   } catch (err) {
+      return res.json({response: err});
+   }
+
+}
+
+
 
 
 
