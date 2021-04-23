@@ -56,6 +56,15 @@ class IndexView extends Component {
    }
 
 
+   async deleteCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.deleteCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+
+
 
    componentDidMount() {
       this.getCourses(this.props.current_user.id);
@@ -260,7 +269,7 @@ class IndexView extends Component {
                                  {!this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>}
                                  {this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>}
                                  &nbsp;
-                                 {this.props.current_user.is_instructor && <button className="btn btn-danger" data-id={value.id} onClick={""}>Delete</button>}
+                                 {this.props.current_user.is_instructor && <button className="btn btn-danger" data-id={value.id} onClick={() => this.deleteCourse(value.id)}>Delete</button>}
                               </td>
                               <td>
                                  {value.name}

@@ -48,14 +48,22 @@ class Course {
    }
 
    async archiveCourse(course_id, user_id) {
-      const path = "http://localhost:8080/api/course/{:course_id}/archive";
+      const path = this.config.endpoints.course.archive;
       const endpoint = this.config.constructRoute(path, [course_id]);
       const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
       return result.data?.response;
    }
 
    async reinstateCourse(course_id, user_id) {
-      const path = "http://localhost:8080/api/course/{:course_id}/reinstate";
+      const path = this.config.endpoints.course.reinstate;
+      const endpoint = this.config.constructRoute(path, [course_id]);
+      const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
+      return result.data?.response;
+   }
+
+
+   async deleteCourse(course_id, user_id) {
+      const path = this.config.endpoints.course.delete;
       const endpoint = this.config.constructRoute(path, [course_id]);
       const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
       return result.data?.response;

@@ -52,7 +52,10 @@ class SharedConfig{
             deleted_assignments: root_endpoint + "/api/course/{:id}/assignments/inactive",
             enrolled: root_endpoint + "/api/course/enrolled",
             course_user: root_endpoint + "/api/course/{:course_id}/user",
-            roster: root_endpoint + "/api/course/{:course_id}/addRoster"
+            roster: root_endpoint + "/api/course/{:course_id}/addRoster",
+            archive: root_endpoint + "/api/course/{:course_id}/archive",
+            reinstate: root_endpoint + "/api/course/{:course_id}/reinstate",
+            delete: root_endpoint + "/api/course/{:course_id}/delete"
          },
          user: {
             create: root_endpoint + "/api/user/create",
