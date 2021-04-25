@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import './index.css';
 import { Link } from 'react-router-dom';
+import {Alert} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
@@ -57,9 +59,12 @@ class IndexView extends Component {
 
 
    async deleteCourse(course_id) {
-      const user_id = this.props.current_user.id;
-      await this.props.models.course.deleteCourse(course_id, user_id);
-      this.getCourses(user_id);
+      const confirm = window.confirm("Are you sure you would like to delete this course?");
+      if (confirm) {
+         const user_id = this.props.current_user.id;
+         await this.props.models.course.deleteCourse(course_id, user_id);
+         this.getCourses(user_id);
+      }
    }
 
 
