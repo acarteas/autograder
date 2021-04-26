@@ -156,7 +156,6 @@ class IndexView extends Component {
       const archived_courses = this.state.archived_courses;
       const self = this;
 
-      console.log(enrolled_courses);
       
       const toggleCreate = () => {
          create = !create;
@@ -205,6 +204,8 @@ class IndexView extends Component {
                         const is_instructor = course_roles.can_modify_course && (user_roles.is_instructor || user_roles.is_admin) && !user_roles.is_account_pending;
                         const is_grader = course_roles.can_grade_assignment && !user_roles.is_account_pending;
                         const can_submit = course_roles.can_submit_assignment && !user_roles.is_account_pending;
+
+                        
                         return (
                            <tr key={value.id}>
                               <td>

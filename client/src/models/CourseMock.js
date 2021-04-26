@@ -51,6 +51,17 @@ class CourseMock {
          school_name: "Humboldt State University",
          term: "Spring",
          year: 2019
+      },
+      {
+         acronym: "HSU",
+         id: 2,
+         is_active: 0,
+         is_deleted: 0,
+         name: "CS 243",
+         school_id: 1,
+         school_name: "Humboldt State University",
+         term: "Spring",
+         year: 2019
       }];
    }
 
@@ -124,6 +135,33 @@ class CourseMock {
             school_id: 1,
             term: "Spring",
             user_id: 1,
+            year: 2019
+         }];
+      }
+
+      if (user_id === 2) {
+         return [{
+            course_id: 1,
+            course_role: 20,
+            id: 1,
+            is_active: 1,
+            is_deleted: 0,
+            name: "CS 211",
+            school_id: 1,
+            term: "Spring",
+            user_id: 2,
+            year: 2019
+         },
+         {
+            course_id: 2,
+            course_role: 20,
+            id: 2,
+            is_active: 0,
+            is_deleted: 0,
+            name: "CS 243",
+            school_id: 1,
+            term: "Spring",
+            user_id: 2,
             year: 2019
          }];
       }
