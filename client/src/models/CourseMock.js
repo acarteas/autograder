@@ -112,8 +112,24 @@ class CourseMock {
    /**
  * Returns all courses that the currently logged in user is taking
  */
-   async getCoursesForUser() {
+   async getCoursesForUser(user_id) {
+      if (user_id === 1) {
+         return [{
+            course_id: 1,
+            course_role: 1,
+            id: 1,
+            is_active: 1,
+            is_deleted: 0,
+            name: "CS 211",
+            school_id: 1,
+            term: "Spring",
+            user_id: 1,
+            year: 2019
+         }];
+      }
+
       return [];
+      
    }
 
    /**

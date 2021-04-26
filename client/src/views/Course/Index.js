@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import './index.css';
 import { Link } from 'react-router-dom';
-import {Alert} from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 
@@ -122,7 +120,8 @@ class IndexView extends Component {
          })
          .then(() => this.props.models.course.all())
          .then(result => {
-            this.setState({ all_courses: result })
+
+            this.setState({ all_courses: result });
          })
          .catch((err) => { });
    }
@@ -157,9 +156,7 @@ class IndexView extends Component {
       const archived_courses = this.state.archived_courses;
       const self = this;
 
-      console.log(this.state.archived_courses);
-
-      
+      console.log(enrolled_courses);
       
       const toggleCreate = () => {
          create = !create;
@@ -211,7 +208,7 @@ class IndexView extends Component {
                         return (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={() => this.archiveCourse(value.id)}>Archive</button>
+                                 {(!is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button> : is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.archiveCourse(value.id)}>Archive</button>}
                                  &nbsp;
                                  {this.renderModifyLink(is_instructor, value.id)}
                                  &nbsp;
@@ -263,18 +260,21 @@ class IndexView extends Component {
                         }
                         else {
                            if (enrolled_courses[course.id] === undefined) {
-                              result.push(course)
+                              if (course.is_active) {
+                                 result.push(course);
+                              }
                            }
                         }
-                        console.log(all_courses);
                         return result;
                      }, []).map((value, index) => (
                            <tr key={value.id}>
                               <td>
-                                 {!this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>}
-                                 {this.props.current_user.is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>}
-                                 &nbsp;
-                                 {this.props.current_user.is_instructor && <button className="btn btn-danger" data-id={value.id} onClick={() => this.deleteCourse(value.id)}>Delete</button>}
+                              {(!this.props.current_user.is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button> : 
+                                 <>
+                                    <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>
+                                    &nbsp;
+                                    <button className="btn btn-danger" data-id={value.id} onClick={() => this.deleteCourse(value.id)}>Delete</button>
+                                 </>}
                               </td>
                               <td>
                                  {value.name}
