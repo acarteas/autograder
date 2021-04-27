@@ -154,7 +154,16 @@ router.delete('/assignment/:aid/file', (req, res) => assignmentRoute.deleteFile(
 router.get('/course', (req, res) => courseRoute.courses(req, res, db)); 
 
 // Creates a course. 
-router.post('/course', (req, res) => courseRoute.createCourse(req, res, db, acl)); 
+router.post('/course', (req, res) => courseRoute.createCourse(req, res, db, acl));
+
+// Flags course as inactive
+router.put('/course/:course_id/archive', (req, res) => courseRoute.archiveCourse(req, res, db, acl));
+
+// Flags course as active
+router.put('/course/:course_id/reinstate', (req, res) => courseRoute.reinstateCourse(req, res, db, acl));
+
+// Flags course as deleted
+router.put('/course/:course_id/delete', (req, res) => courseRoute.deleteCourse(req, res, db, acl));
 
 // returns all assignments from the given course 
 router.get('/course/:id/assignments', (req, res) => courseRoute.assignments(req, res, db)); 

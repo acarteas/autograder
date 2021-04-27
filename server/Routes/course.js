@@ -239,6 +239,91 @@ exports.editRole = function (req, res, db, acl) {
 
 
 
+/** 
+ * Flags course as inactive. 
+ * @param {Object} req HTTP request object. 
+ * @param {Object} res HTTP response object. 
+ * @param {Object} db Database connection. 
+ * @param {Object} acl Object containing AccessControlList methods. 
+ * @returns {Object} JSON response with true if successful or an error if not. 
+ */
+exports.archiveCourse = async function (req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.session.user.id;
+   try {
+      const isCreator = await acl.isCreator(course_id, user_id);
+
+      if (!isCreator) {
+         throw new Error("YOU ARE NOT THE COURSE CREATOR");
+      }
+
+      const result = await db.Courses.archive(course_id, user_id);
+      return res.json({response: result});
+   } catch (err) {
+      return res.json({response: err});
+   }
+
+}
+
+
+/** 
+ * Flags course as active. 
+ * @param {Object} req HTTP request object. 
+ * @param {Object} res HTTP response object. 
+ * @param {Object} db Database connection. 
+ * @param {Object} acl Object containing AccessControlList methods. 
+ * @returns {Object} JSON response with true if successful or an error if not. 
+ */
+exports.reinstateCourse = async function (req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.session.user.id;
+   
+   try {
+      const isCreator = await acl.isCreator(course_id, user_id);
+
+      if (!isCreator) {
+         throw new Error("YOU ARE NOT THE COURSE CREATOR");
+      }
+      
+      const result = await db.Courses.reinstate(course_id, user_id);
+      return res.json({response: result});
+   } catch (err) {
+      return res.json({response: err});
+   }
+
+}
+
+
+/** 
+ * Flags course as deleted. 
+ * @param {Object} req HTTP request object. 
+ * @param {Object} res HTTP response object. 
+ * @param {Object} db Database connection. 
+ * @param {Object} acl Object containing AccessControlList methods. 
+ * @returns {Object} JSON response with true if successful or an error if not. 
+ */
+exports.deleteCourse = async function (req, res, db, acl) {
+   const course_id = req.params.course_id;
+   const user_id = req.session.user.id;
+   
+   try {
+      const isCreator = await acl.isCreator(course_id, user_id);
+
+      if (!isCreator) {
+         throw new Error("YOU ARE NOT THE COURSE CREATOR");
+      }
+      
+      const result = await db.Courses.delete(course_id, user_id);
+      return res.json({response: result});
+   } catch (err) {
+      return res.json({response: err});
+   }
+
+}
+
+
+
+
 
 /** 
  * Returns all courses that the currently logged in user is taking.

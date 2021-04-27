@@ -1,6 +1,7 @@
 import React from 'react';
 import {render, screen, fireEvent, act, cleanup} from "@testing-library/react";
 import axios from 'axios';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 
 import {IndexView, CourseTemplate} from '../views/Course/Index';
@@ -25,7 +26,7 @@ const studentUser = {
 }
 
 const instructorUser = {
-    id: 1,
+    id: 2,
     is_account_pending: 0,
     is_admin: 0,
     is_instructor: 1,
@@ -38,7 +39,7 @@ const instructorUser = {
 }
 
 const adminUser = {
-    id: 1,
+    id: 3,
     is_account_pending: 0,
     is_admin: 1,
     is_instructor: 0,
@@ -61,6 +62,7 @@ describe('Student View of My Courses', () => {
     test('renders basic layout properly', () => {
         render(<IndexView current_user={studentUser} models={models}/>);
 
+        
         expect(screen.getByText('Available Courses')).toBeInTheDocument();
         expect(screen.getByText('My Courses')).toBeInTheDocument();
     })
@@ -72,7 +74,7 @@ describe('Student View of My Courses', () => {
         expect(document.getElementById('createNewCourseButton')).toBeFalsy();
     })
 
-
+    
     test('renders fetched courses', async () => {
         const promise = Promise.resolve({payload: "data"});
         axios.get.mockImplementationOnce(() => promise);
@@ -82,7 +84,7 @@ describe('Student View of My Courses', () => {
         await act(() => promise);
         
         expect(screen.getByText("CS 211")).toBeInTheDocument();
-        expect(screen.getByText("Add")).toBeInTheDocument();
+        expect(screen.getByText("Remove")).toBeInTheDocument();
     })
 
 })
@@ -92,38 +94,82 @@ describe('Student View of My Courses', () => {
 describe('Instructor View of My Courses', () => {
 
     test('renders basic layout properly', () => {
-        render(<IndexView current_user={instructorUser} models={models}/>);
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>);
 
-        expect(screen.getByText('Available Courses')).toBeInTheDocument();
+        expect(screen.getByText('Archived Courses')).toBeInTheDocument();
         expect(screen.getByText('My Courses')).toBeInTheDocument();
     })
 
 
     test('renders "add course" button', () => {
-        render(<IndexView current_user={instructorUser} models={models}/>);
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>);
         
         expect(document.getElementById('createNewCourseButton')).toBeInTheDocument();
     })
 
 
     test('clicking "add course" button creates template', () => {
-        render(<IndexView current_user={instructorUser} models={models}/>);
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>);
         fireEvent.click(document.getElementById('createNewCourseButton'));
-        render(<IndexView current_user={instructorUser} models={models}/>);
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>);
         expect(screen.getByText('Submit')).toBeInTheDocument();
     })
 
-    test('renders fetched courses', async () => {
+
+
+    test('renders fetched active courses', async () => {
         const promise = Promise.resolve({payload: "data"});
         axios.get.mockImplementationOnce(() => promise);
         
-        render(<IndexView current_user={studentUser} models={models}/>);
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>
+        )
+        
 
         await act(() => promise);
         
+
         expect(screen.getByText("CS 211")).toBeInTheDocument();
-        expect(screen.getByText("Add")).toBeInTheDocument();
+        expect(screen.getByText("Archive")).toBeInTheDocument();
+        expect(screen.getByText("Manage")).toBeInTheDocument();
+        expect(screen.getByText("Assignments")).toBeInTheDocument();
     })
+
+
+    test('renders fetched archived courses', async () => {
+        const promise = Promise.resolve({payload: "data"});
+        axios.get.mockImplementationOnce(() => promise);
+        
+        render(
+        <Router>
+            <IndexView current_user={instructorUser} models={models}/>);
+        </Router>
+        )
+        
+
+        await act(() => promise);
+        
+
+        expect(screen.getByText("CS 243")).toBeInTheDocument();
+        expect(screen.getByText("Reinstate")).toBeInTheDocument();
+        expect(screen.getByText("Delete")).toBeInTheDocument();
+    })
+
+    
 
 })
 
@@ -157,12 +203,11 @@ describe('Adimin View of My Courses', () => {
         const promise = Promise.resolve({payload: "data"});
         axios.get.mockImplementationOnce(() => promise);
         
-        render(<IndexView current_user={studentUser} models={models}/>);
+        render(<IndexView current_user={adminUser} models={models}/>);
 
         await act(() => promise);
         
         expect(screen.getByText("CS 211")).toBeInTheDocument();
-        expect(screen.getByText("Add")).toBeInTheDocument();
     })
 
 })

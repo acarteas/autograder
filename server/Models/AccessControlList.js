@@ -47,6 +47,18 @@ class AccessControlList {
       });
    }
 
+
+   async isCreator(course_id, user_id) {
+      try {
+         const result = await this.db.Courses.isCreator(course_id, user_id);
+         return result;
+      } catch (err) {
+         console.log(err);
+         return err;
+      }
+      
+   }
+
    /**
     * Resolves with true if the current user can create courses.
     * @param {*} session Current session.

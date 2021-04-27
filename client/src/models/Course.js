@@ -19,6 +19,7 @@ class Course {
       this.getCoursePrivileges = this.getCoursePrivileges.bind(this);
       this.getCoursePrivilegeNumber = this.getCoursePrivilegeNumber.bind(this);
       this.addCourseAsync = this.addCourseAsync.bind(this);
+      this.archiveCourse = this.archiveCourse.bind(this);
    }
 
 
@@ -43,6 +44,28 @@ class Course {
       const path = this.config.endpoints.course.course_user;
       const endpoint = this.config.constructRoute(path, [course_id]);
       const result = await WebRequest.makePostAsync(endpoint, {user_id: user_id });
+      return result.data?.response;
+   }
+
+   async archiveCourse(course_id, user_id) {
+      const path = this.config.endpoints.course.archive;
+      const endpoint = this.config.constructRoute(path, [course_id]);
+      const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
+      return result.data?.response;
+   }
+
+   async reinstateCourse(course_id, user_id) {
+      const path = this.config.endpoints.course.reinstate;
+      const endpoint = this.config.constructRoute(path, [course_id]);
+      const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
+      return result.data?.response;
+   }
+
+
+   async deleteCourse(course_id, user_id) {
+      const path = this.config.endpoints.course.delete;
+      const endpoint = this.config.constructRoute(path, [course_id]);
+      const result = await WebRequest.makePutAsync(endpoint, {user_id: user_id});
       return result.data?.response;
    }
 

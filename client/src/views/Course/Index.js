@@ -21,6 +21,7 @@ class IndexView extends Component {
       this.state = {
          all_courses: [],
          enrolled_courses: {},
+         archived_courses: {}
       };
 
       this.getCourses = this.getCourses.bind(this);
@@ -38,6 +39,33 @@ class IndexView extends Component {
       parent.getCourses(user_id);
       create = false;
    }
+
+
+
+   async archiveCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.archiveCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+   async reinstateCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.reinstateCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+   async deleteCourse(course_id) {
+      const confirm = window.confirm("Are you sure you would like to delete this course?");
+      if (confirm) {
+         const user_id = this.props.current_user.id;
+         await this.props.models.course.deleteCourse(course_id, user_id);
+         this.getCourses(user_id);
+      }
+   }
+
+
 
 
 
@@ -79,14 +107,21 @@ class IndexView extends Component {
       this.props.models.course.getCoursesForUser(user_id)
          .then(result => {
             let courses = {};
+            let archived = {};
             for (let course of result) {
-               courses[course.id] = course;
+               if (course.is_active) {
+                  courses[course.id] = course;
+               }
+               else {
+                  archived[course.id] = course;
+               }
             }
-            return new Promise(resolve => this.setState({ enrolled_courses: courses }, resolve));
+            return new Promise(resolve => this.setState({ enrolled_courses: courses, archived_courses: archived }, resolve));
          })
          .then(() => this.props.models.course.all())
          .then(result => {
-            this.setState({ all_courses: result })
+
+            this.setState({ all_courses: result });
          })
          .catch((err) => { });
    }
@@ -118,9 +153,9 @@ class IndexView extends Component {
    render() {
       const all_courses = this.state.all_courses;
       const enrolled_courses = this.state.enrolled_courses;
+      const archived_courses = this.state.archived_courses;
       const self = this;
 
-      
       
       const toggleCreate = () => {
          create = !create;
@@ -169,10 +204,12 @@ class IndexView extends Component {
                         const is_instructor = course_roles.can_modify_course && (user_roles.is_instructor || user_roles.is_admin) && !user_roles.is_account_pending;
                         const is_grader = course_roles.can_grade_assignment && !user_roles.is_account_pending;
                         const can_submit = course_roles.can_submit_assignment && !user_roles.is_account_pending;
+
+                        
                         return (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button>
+                                 {(!is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button> : is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.archiveCourse(value.id)}>Archive</button>}
                                  &nbsp;
                                  {this.renderModifyLink(is_instructor, value.id)}
                                  &nbsp;
@@ -202,7 +239,7 @@ class IndexView extends Component {
                </table>
             </article>
             <article>
-               <h1>Available Courses</h1>
+               <h1>{(this.props.current_user.is_instructor) ? "Archived Courses" : "Available Courses"}</h1>
                <table className="table table-striped">
                   <thead>
                      <tr>
@@ -217,15 +254,28 @@ class IndexView extends Component {
                   </thead>
                   <tbody>
                      {all_courses.reduce((result, course) => {
-                        if (enrolled_courses[course.id] === undefined) {
-                           result.push(course)
+                        if (this.props.current_user.is_instructor){
+                           if (archived_courses[course.id] !== undefined) {
+                              result.push(course);
+                           }
+                        }
+                        else {
+                           if (enrolled_courses[course.id] === undefined) {
+                              if (course.is_active) {
+                                 result.push(course);
+                              }
+                           }
                         }
                         return result;
-                     }, []).map((value, index) => {
-                        return (
+                     }, []).map((value, index) => (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>
+                              {(!this.props.current_user.is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button> : 
+                                 <>
+                                    <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>
+                                    &nbsp;
+                                    <button className="btn btn-danger" data-id={value.id} onClick={() => this.deleteCourse(value.id)}>Delete</button>
+                                 </>}
                               </td>
                               <td>
                                  {value.name}
@@ -241,7 +291,6 @@ class IndexView extends Component {
                               </td>
                            </tr>
                         )
-                     }
                      )}
                   </tbody>
                </table>
