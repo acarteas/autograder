@@ -12,7 +12,8 @@ import TestCases from './components/TestCasesComponent';
 import ManageTests from './components/ManageTestsComponent';
 import Results from './components/ResultsComponent';
 import BulkResults from './components/BulkResultsComponent'
-import Description from './components/DescriptionComponent'; 
+import Description from './components/DescriptionComponent';
+import GithubRepoLink from './components/GithubRepoLinkComponent';
 
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
@@ -303,12 +304,9 @@ class IndexView extends Component {
                         if (self.selectedUser().id === self.props.current_user.id) {
                            return (
                               <div className="container">
-                                 <AddFiles
-                                    assignment={this.state.current_assignment}
-                                    file_add_callback={this.updateFiles}
-                                    file_remove_callback={this.removeTab}
-                                    files={this.state.files}
-                                 />
+                              
+                                 <GithubRepoLink />
+                                 
                               </div>
                            )
                         }
