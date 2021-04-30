@@ -305,7 +305,7 @@ class IndexView extends Component {
                            return (
                               <div className="container">
                               
-                                 <GithubRepoLink />
+                                 <GithubRepoLink assignment_id={this.state.current_assignment.id} props={self.props}/>
                                  
                               </div>
                            )
