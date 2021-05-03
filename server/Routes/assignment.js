@@ -724,9 +724,14 @@ exports.zipGradingFiles = function(req, res, db, acl) {
       .then(() => acl.userHasAssignment(session.user, assignment_id))
    
       // if so, add repository
+      .then(() => db.Assignments.Repo.isUnique(url))
       .then(() => db.Assignments.Repo.add(session.user.id, assignment_id, url))
-      .then(result => {console.log(result); res.json({ response: result })})
+      .then(result => res.json({ response: result }))
       .catch(err =>
          res.json({ response: err })
       );
 }
+
+
+
+

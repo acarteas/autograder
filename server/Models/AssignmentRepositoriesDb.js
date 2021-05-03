@@ -38,6 +38,7 @@ class AssignmentRepositoriesDb {
                resolve(this.lastID);
             }
             else {
+               console.log(err)
                reject(err);
             }
          };
@@ -92,7 +93,31 @@ class AssignmentRepositoriesDb {
          });
      });
    }
+
+
+
+   isUnique(url) {
+      const sql = "SELECT * FROM assignment_repositories WHERE url = $url";
+      const params = {$url: url};
+      return new Promise((resolve, reject) => {
+         this.db.get(sql, params, (err, row) => {
+            if (err === null && row !== undefined) {
+               reject("Repository is already linked!");
+            }
+            else if (err !== null) {
+               console.log(err);
+            }
+            resolve(true);
+         });
+     });
+   }
 }
+
+
+
+
+
+
 
 
 

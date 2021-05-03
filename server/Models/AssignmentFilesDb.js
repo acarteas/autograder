@@ -23,33 +23,7 @@ class AssignmentFilesDb {
 
 
 
-   /**
-    * Adds a new course with the given information to the database.
-    * @param {Number} user_id The ID of the user submitting repository.
-    * @param {String} assignment_id The ID of the assignment the repository is meant for. 
-    * @param {String} url The URL of the repository.
-    * @returns {Promise} 
-    */
-    addRepository(user_id, assignment_id, url) {
-      const sql = "INSERT INTO assignment_repositories(user_id, assignment_id, url) VALUES($school_id, $name, $term, $year)";
-      const params = { $user_id: user_id, $assignment_id: assignment_id, $url: url }
-
-      return new Promise((resolve, reject) => {
-
-         //AC: placing db callback function into its own variable changes 
-         //*this* from local object to result of sqlite3 db call.
-         var local_callback = function (err) {
-            if (err === null) {
-               resolve(this.lastID);
-            }
-            else {
-               console.log(err);
-               reject(err);
-            }
-         };
-         this.db.run(sql, params, local_callback);
-      });
-   }
+   
 
 
 
