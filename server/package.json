@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "node serverCopy.js & node server.js"
+    "start": "node serverCopy.js && node server.js"
   },
   "author": "Adam Carter",
   "license": "ISC",
