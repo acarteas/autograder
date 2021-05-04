@@ -1,3 +1,5 @@
+function DBCopy() {
+
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
@@ -28,7 +30,7 @@ fs.access('autograder.db', (err) => {
                 };
 
                 //copy autograder.db from template into the data folder'
-                copyFile('autograder_template.db', 'autogradertest.db');
+                copyFile('autograder_template.db', 'autograder.db');
   
                 //display more input
                 console.log(`autograder.db has been copied.`);
@@ -43,3 +45,6 @@ fs.access('autograder.db', (err) => {
         console.log('autograder.db exists.');
     }
 });
+
+    return 1;
+}
