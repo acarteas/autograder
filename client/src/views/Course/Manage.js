@@ -16,6 +16,7 @@ class ManageView extends Component {
       this.state = {
          courses: [],
          selected_course: Number(this.props.match.params.id),
+         course_instructors: [],
          course_tas: [],
          users_pending: [],
          users_active: []
@@ -59,6 +60,7 @@ class ManageView extends Component {
    getUsers() {
       this.props.models.course.getCourseUsers(this.state.selected_course)
          .then((result) => {
+            let instructors = [];
             let tas = [];
             let active_users = [];
             let pending_users = [];
@@ -66,8 +68,15 @@ class ManageView extends Component {
             //filter course users based on access rights
             for (let user of result) {
                const privilege = this.props.models.course.getCoursePrivileges(user.course_role);
+               console.log(user);
+
                if (privilege.can_grade_assignment === true) {
-                  tas.push(user);
+                  if (user.is_instructor) {
+                     instructors.push(user);
+                  }
+                  else {
+                     tas.push(user);
+                  }
                }
                else if (privilege.can_submit_assignment === true) {
                   active_users.push(user);
@@ -76,7 +85,7 @@ class ManageView extends Component {
                   pending_users.push(user);
                }
             }
-            this.setState({ course_tas: tas, users_pending: pending_users, users_active: active_users });
+            this.setState({ course_instructors: instructors, course_tas: tas, users_pending: pending_users, users_active: active_users });
          })
          .catch(err => { });
    }
@@ -108,6 +117,8 @@ class ManageView extends Component {
       } )
       .catch( () => {});
    }
+
+
    removeTa(evt){
       const course = this.props.models.course;
       const index = Number(evt.target.dataset.id);
@@ -185,6 +196,10 @@ class ManageView extends Component {
                   </option>
                )}
             </select>
+            <article>
+               <h1>Instructors</h1>
+               <UserList header={headers} raw_data={this.state.course_instructors} data_cols={student_headers} buttons={ta_buttons} />
+            </article>
             <article>
                <h1>TAs</h1>
                <UserList header={headers} raw_data={this.state.course_tas} data_cols={student_headers} buttons={ta_buttons} />

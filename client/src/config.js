@@ -13,7 +13,7 @@ class SharedConfig{
    }
 
    constructRoute(path, params)
-   {
+   {            
       let next_arg = 0; 
 
       // while there is still an unreplaced {parameter} in path
@@ -32,7 +32,8 @@ class SharedConfig{
       this.endpoints = {
          root: root_endpoint,
          assignment: {
-            user_files: root_endpoint + "/api/assignment/{:aid}/user/{:uid}/file", 
+            user_files: root_endpoint + "/api/assignment/{:aid}/user/{:uid}/file",
+            repo: root_endpoint + "/api/assignment/{:aid}/repo", 
             file: root_endpoint + "/api/assignment/{:aid}/file", 
             test_cases: root_endpoint + "/api/assignment/{:assignment_id}/testCases",
             test_results: root_endpoint + "/api/assignment/{:assignment_id}/user/{:user_id}/testResults",
@@ -52,7 +53,10 @@ class SharedConfig{
             deleted_assignments: root_endpoint + "/api/course/{:id}/assignments/inactive",
             enrolled: root_endpoint + "/api/course/enrolled",
             course_user: root_endpoint + "/api/course/{:course_id}/user",
-            roster: root_endpoint + "/api/course/{:course_id}/addRoster"
+            roster: root_endpoint + "/api/course/{:course_id}/addRoster",
+            archive: root_endpoint + "/api/course/{:course_id}/archive",
+            reinstate: root_endpoint + "/api/course/{:course_id}/reinstate",
+            delete: root_endpoint + "/api/course/{:course_id}/delete"
          },
          user: {
             create: root_endpoint + "/api/user/create",

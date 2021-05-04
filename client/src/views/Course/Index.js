@@ -3,9 +3,15 @@ import { connect } from "react-redux";
 import './index.css';
 import { Link } from 'react-router-dom';
 
+
+
 const mapStateToProps = state => {
    return { current_user: state.current_user, models: state.models };
 };
+
+
+let create = false;
+
 
 class IndexView extends Component {
 
@@ -14,7 +20,8 @@ class IndexView extends Component {
 
       this.state = {
          all_courses: [],
-         enrolled_courses: {}
+         enrolled_courses: {},
+         archived_courses: {}
       };
 
       this.getCourses = this.getCourses.bind(this);
@@ -22,6 +29,45 @@ class IndexView extends Component {
       this.renderModifyLink = this.renderModifyLink.bind(this);
       this.renderAssignmentsLink = this.renderAssignmentsLink.bind(this);
    }
+
+
+   
+   // Add the new course to the database
+   async addCourseAsync(course, parent) {      
+      const user_id = parent.props.current_user.id;
+      await parent.props.models.course.addCourseAsync(course, user_id);
+      parent.getCourses(user_id);
+      create = false;
+   }
+
+
+
+   async archiveCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.archiveCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+   async reinstateCourse(course_id) {
+      const user_id = this.props.current_user.id;
+      await this.props.models.course.reinstateCourse(course_id, user_id);
+      this.getCourses(user_id);
+   }
+
+
+   async deleteCourse(course_id) {
+      const confirm = window.confirm("Are you sure you would like to delete this course?");
+      if (confirm) {
+         const user_id = this.props.current_user.id;
+         await this.props.models.course.deleteCourse(course_id, user_id);
+         this.getCourses(user_id);
+      }
+   }
+
+
+
+
 
    componentDidMount() {
       this.getCourses(this.props.current_user.id);
@@ -61,13 +107,22 @@ class IndexView extends Component {
       this.props.models.course.getCoursesForUser(user_id)
          .then(result => {
             let courses = {};
+            let archived = {};
             for (let course of result) {
-               courses[course.id] = course;
+               if (course.is_active) {
+                  courses[course.id] = course;
+               }
+               else {
+                  archived[course.id] = course;
+               }
             }
-            return new Promise(resolve => this.setState({ enrolled_courses: courses }, resolve));
+            return new Promise(resolve => this.setState({ enrolled_courses: courses, archived_courses: archived }, resolve));
          })
          .then(() => this.props.models.course.all())
-         .then(result => this.setState({ all_courses: result }))
+         .then(result => {
+
+            this.setState({ all_courses: result });
+         })
          .catch((err) => { });
    }
 
@@ -93,10 +148,20 @@ class IndexView extends Component {
       }
    }
 
+   
+
    render() {
       const all_courses = this.state.all_courses;
       const enrolled_courses = this.state.enrolled_courses;
+      const archived_courses = this.state.archived_courses;
       const self = this;
+
+      
+      const toggleCreate = () => {
+         create = !create;
+         this.getCourses(this.props.current_user.id);
+      }
+
       return (
          <article className="container">
             <article>
@@ -104,7 +169,19 @@ class IndexView extends Component {
                <table className="table table-striped text-left">
                   <thead>
                      <tr>
-                        <th scope="col"></th>
+                        <th scope="col">
+                           {
+                              ((this.props.current_user.is_instructor === 1)
+                              || (this.props.current_user.is_admin === 1))
+                              && <button
+                              className={(create) ? "btn btn-danger" : "btn btn-success"}
+                              onClick={toggleCreate}
+                              id="createNewCourseButton"
+                              >
+                              {(create) ? "X" : "+"}
+                              </button>
+                           }
+                        </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
                         <th scope="col">Year</th>
@@ -121,16 +198,18 @@ class IndexView extends Component {
                         const course_roles = self.props.models.course.getCoursePrivileges(enrolled_courses[value.id].course_role);
                         const user_roles = {
                            is_instructor: Boolean(self.props.current_user.is_instructor),
-                           is_admin: Boolean(self.props.current_user.is_admin), 
+                           is_admin: Boolean(self.props.current_user.is_admin),
                            is_account_pending: Boolean(self.props.current_user.is_account_pending)
                         };
                         const is_instructor = course_roles.can_modify_course && (user_roles.is_instructor || user_roles.is_admin) && !user_roles.is_account_pending;
-                        const is_grader = course_roles.can_grade_assignment && !user_roles.is_account_pending; 
+                        const is_grader = course_roles.can_grade_assignment && !user_roles.is_account_pending;
                         const can_submit = course_roles.can_submit_assignment && !user_roles.is_account_pending;
+
+                        
                         return (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button>
+                                 {(!is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Remove</button> : is_instructor && <button className="btn btn-primary" data-id={value.id} onClick={() => this.archiveCourse(value.id)}>Archive</button>}
                                  &nbsp;
                                  {this.renderModifyLink(is_instructor, value.id)}
                                  &nbsp;
@@ -152,15 +231,21 @@ class IndexView extends Component {
                         )
                      }
                      )}
+                     {create && <CourseTemplate 
+                        handleSubmission={self.addCourseAsync}
+                        props={self}
+                        />}
                   </tbody>
                </table>
             </article>
             <article>
-               <h1>Available Courses</h1>
+               <h1>{(this.props.current_user.is_instructor) ? "Archived Courses" : "Available Courses"}</h1>
                <table className="table table-striped">
                   <thead>
                      <tr>
-                        <th scope="col"></th>
+                        <th scope="col">
+
+                        </th>
                         <th scope="col">Course Name</th>
                         <th scope="col">School</th>
                         <th scope="col">Year</th>
@@ -169,15 +254,28 @@ class IndexView extends Component {
                   </thead>
                   <tbody>
                      {all_courses.reduce((result, course) => {
-                        if (enrolled_courses[course.id] === undefined) {
-                           result.push(course)
+                        if (this.props.current_user.is_instructor){
+                           if (archived_courses[course.id] !== undefined) {
+                              result.push(course);
+                           }
+                        }
+                        else {
+                           if (enrolled_courses[course.id] === undefined) {
+                              if (course.is_active) {
+                                 result.push(course);
+                              }
+                           }
                         }
                         return result;
-                     }, []).map((value, index) => {
-                        return (
+                     }, []).map((value, index) => (
                            <tr key={value.id}>
                               <td>
-                                 <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button>
+                              {(!this.props.current_user.is_instructor) ? <button className="btn btn-primary" data-id={value.id} onClick={self.courseButtonClick}>Add</button> : 
+                                 <>
+                                    <button className="btn btn-primary" data-id={value.id} onClick={() => this.reinstateCourse(value.id)}>Reinstate</button>
+                                    &nbsp;
+                                    <button className="btn btn-danger" data-id={value.id} onClick={() => this.deleteCourse(value.id)}>Delete</button>
+                                 </>}
                               </td>
                               <td>
                                  {value.name}
@@ -193,7 +291,6 @@ class IndexView extends Component {
                               </td>
                            </tr>
                         )
-                     }
                      )}
                   </tbody>
                </table>
@@ -203,6 +300,59 @@ class IndexView extends Component {
    }
 }
 
+
+
+// Course template to be filled out by creator
+const CourseTemplate = ({handleSubmission, props}) => {
+   const [courseName, setCourseName] = React.useState("");
+   const [schoolId, setSchoolId] = React.useState("1");
+   const [term, setTerm] = React.useState("Spring");
+   const [year, setYear] = React.useState("");
+   
+   return (
+      <tr>
+         <td>
+            <button
+               id='submitNewCourseButton' 
+               className="btn btn-primary" 
+               onClick={() => handleSubmission({
+                  school_id: schoolId,
+                  name: courseName,
+                  term: term,
+                  year: year
+               }, props)}
+               >Submit</button> 
+         </td>
+         <td>
+            <input 
+               placeholder="course name"
+               onChange={e => setCourseName(e.target.value)}
+            ></input>
+         </td>
+         <td>
+           <select onChange={e => setSchoolId(e.target.value)}>
+              <option value="1">HSU</option>
+           </select>
+         </td>
+         <td>
+            <input 
+               placeholder="year"
+               onChange={e => setYear(e.target.value)}
+            ></input>
+         </td>
+         <td>
+         <select onChange={e => setTerm(e.target.value)}>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Fall">Fall</option>
+           </select>
+         </td>
+      </tr>
+   );
+};
+
+
+
 const Index = connect(mapStateToProps)(IndexView);
-export { Index };
+export { Index, IndexView, CourseTemplate };
 export default Index;

@@ -30,6 +30,12 @@ class WebRequest {
       });
    }
 
+   static async makeRequestAsync(url) {
+      const result = await axios(url, { withCredentials: true });
+      return result;
+   }
+   
+
    static makePost(url, post, callback) {
       axios(url, {
          method: "post",
@@ -37,6 +43,15 @@ class WebRequest {
          withCredentials: true
       })
          .then(callback);
+   }
+
+   static async makePostAsync(url, post) {
+      const result = await axios(url, {
+         method: "post",
+         data: post,
+         withCredentials: true
+      })
+      return result;
    }
 
    static makeDelete(url, data, callback){
@@ -55,6 +70,15 @@ class WebRequest {
          withCredentials: true
       })
          .then(callback);
+   }
+
+   static async makePutAsync(url, data) {
+      const result = await axios(url, {
+         method: "put",
+         data: data,
+         withCredentials: true
+      })
+      return result;
    }
 }
 

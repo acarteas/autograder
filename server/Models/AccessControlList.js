@@ -47,6 +47,40 @@ class AccessControlList {
       });
    }
 
+
+
+   /**
+    * Resolves with true if user can modify the given course.
+    * @param {Object} user
+    * @param {Number} course_id The course's ID number (integer).
+    * @returns {Promise} Promise object represents the result of calling canModify().
+    */
+    canSubmitAssignment(user, course_id) {
+      return new Promise((resolve, reject) => {
+         this.db.Courses.canSubmitAssignment(course_id, user.id)
+         .then(result => resolve(result))
+         .catch(err => reject(err));
+      });
+   }
+
+
+   /**
+    * Resolves with true if user can modify the given course.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The user's ID number (integer).
+    * @returns {Promise} Promise object represents the result of calling isCreator().
+    */
+   async isCreator(course_id, user_id) {
+      try {
+         const result = await this.db.Courses.isCreator(course_id, user_id);
+         return result;
+      } catch (err) {
+         console.log(err);
+         return err;
+      }
+      
+   }
+
    /**
     * Resolves with true if the current user can create courses.
     * @param {*} session Current session.
@@ -68,6 +102,26 @@ class AccessControlList {
          if (session.user !== undefined
             && session.user !== null
             && session.user.is_admin === 1
+         ) {
+            resolve(true);
+         }
+         else {
+            reject(false);
+         }
+      });
+   }
+
+   /**
+    * Resolves with true if the current user is an admin or instructor.
+    * @param {*} session Current session.
+    * @returns {Promise} Resolves to true if the user is an admin; rejects false otherwise.
+    */
+    isAdminOrInstructor(session) {
+      return new Promise((resolve, reject) => {
+         if (session.user !== undefined
+            && session.user !== null
+            && (session.user.is_admin === 1
+               || session.user.is_instructor === 1)
          ) {
             resolve(true);
          }

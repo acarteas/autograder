@@ -9,16 +9,16 @@ class CoursesDb {
       this.db = db_connection;
 
       this.addCourse = this.addCourse.bind(this);
-      this.addUser = this.addUser.bind(this); 
+      this.addUser = this.addUser.bind(this);
       this.all = this.all.bind(this);
       this.assignments = this.assignments.bind(this);
       this.canGrade = this.canGrade.bind(this);
       this.canModify = this.canModify.bind(this);
-      this.courseUsers = this.courseUsers.bind(this); 
+      this.courseUsers = this.courseUsers.bind(this);
       this.forUser = this.forUser.bind(this);
       this.isUnique = this.isUnique.bind(this);
-      this.removeUser = this.removeUser.bind(this); 
-      this.setCourseRole = this.setCourseRole.bind(this); 
+      this.removeUser = this.removeUser.bind(this);
+      this.setCourseRole = this.setCourseRole.bind(this);
    }
 
    /**
@@ -49,6 +49,13 @@ class CoursesDb {
          this.db.run(sql, params, local_callback);
       });
    }
+
+
+
+
+
+
+
 
    /**
     * Adds an existing user to a course. 
@@ -83,25 +90,24 @@ class CoursesDb {
     * @returns {Promise} Resolves with all courses if successful; rejects with error otherwise. 
     */
    all(include_deleted = false) {
-      return new Promise((resolve, reject) => { 
+      return new Promise((resolve, reject) => {
          let sql = "SELECT c.*, s.name AS school_name, s.acronym  FROM courses c INNER JOIN schools s ON c.school_id = s.id";
          if (include_deleted === false) {
-            sql += " WHERE is_deleted = 0 AND is_active = 1";
+            sql += " WHERE is_deleted = 0";
          }
          sql += " ORDER BY c.year, c.term DESC";
          this.db.all(sql, {}, (err, rows) => {
-               if (err === null && rows !== undefined) {
-                  resolve(rows);
-               }
-               else if (err !== null) {
-                  console.log(err);
-                  reject(err);
-               }
-               else
-               {
-                  reject(false);
-               }
-            });
+            if (err === null && rows !== undefined) {
+               resolve(rows);
+            }
+            else if (err !== null) {
+               console.log(err);
+               reject(err);
+            }
+            else {
+               reject(false);
+            }
+         });
       });
    }
 
@@ -115,13 +121,11 @@ class CoursesDb {
    assignments(course_id, include_active = true, include_deleted = true) {
       return new Promise((resolve, reject) => {
          let sql = "SELECT * FROM assignments WHERE course_id = $course_id";
-         if(include_active === true && include_deleted === false)
-         {
-            sql += " AND is_deleted = 0"; 
+         if (include_active === true && include_deleted === false) {
+            sql += " AND is_deleted = 0";
          }
-         else if(include_active === false && include_deleted === true)
-         {
-            sql += " AND is_deleted = 1"; 
+         else if (include_active === false && include_deleted === true) {
+            sql += " AND is_deleted = 1";
          }
          this.db.all(sql, { $course_id: course_id }, (err, rows) => {
             if (err === null && rows !== undefined) {
@@ -129,11 +133,10 @@ class CoursesDb {
             }
             else if (err !== null) {
                console.log(err);
-               reject(err); 
+               reject(err);
             }
-            else
-            {
-               reject(false); 
+            else {
+               reject(false);
             }
          });
       });
@@ -159,8 +162,7 @@ class CoursesDb {
                console.log(err);
                reject(err);
             }
-            else
-            {
+            else {
                reject(false);
             }
          });
@@ -187,13 +189,140 @@ class CoursesDb {
                console.log(err);
                reject(err);
             }
-            else
-            {
+            else {
                reject(false);
             }
          });
       });
    }
+
+
+   /**
+    * Returns true if the given user is permitted to modify this course.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the user can upload assignments to this course;
+    *    rejects otherwise.
+    */
+    canSubmitAssignment(course_id, user_id) {
+      return new Promise((resolve, reject) => {
+         const sql = "SELECT * FROM course_users "
+            + "WHERE course_id = $course_id AND user_id = $user_id AND course_role & 2 > 0";
+         const params = { $course_id: course_id, $user_id: user_id }
+         this.db.get(sql, params, (err, row) => {
+            if (err === null && row !== undefined) {
+               resolve(true);
+            }
+            else if (err !== null) {
+               console.log(err);
+               reject(err);
+            }
+            else {
+               reject(false);
+            }
+         });
+      });
+   }
+
+   /**
+    * Returns true if the given user is the creator of this course.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the user is the creator of this course;
+    *    rejects otherwise.
+    */
+   isCreator(course_id, user_id) {
+      return new Promise((resolve, reject) => {
+         const sql = "SELECT * FROM course_users "
+            + "WHERE course_id = $course_id AND user_id = $user_id AND course_role & 16 > 0";
+         const params = { $course_id: course_id, $user_id: user_id };
+         this.db.get(sql, params, (err, row) => {
+            if (err === null && row !== undefined) {
+               resolve(true);
+            }
+            else if (err !== null) {
+               console.log(err);
+               reject(err);
+            }
+            else {
+               reject(false);
+            }
+         });
+      });
+   }
+
+
+
+
+   /**
+    * Returns true if the course was successfully archived.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the course was successfully archived.
+    *    rejects otherwise.
+    */
+   async archive(course_id, user_id) {
+      const sql = "UPDATE courses " + "SET is_active = 0 " + "WHERE id = $course_id;";
+      const params = { $course_id: course_id };
+
+      try {
+         this.db.run(sql, params);
+         return true;
+      } catch (e) {
+         return e;
+      }
+
+   }
+
+
+
+
+   /**
+    * Returns true if the course was successfully reinstated.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the course was successfully reinstated.
+    *    rejects otherwise.
+    */
+   async reinstate(course_id, user_id) {
+      const sql = "UPDATE courses " + "SET is_active = 1 " + "WHERE id = $course_id;";
+      const params = { $course_id: course_id };
+
+      try {
+         this.db.run(sql, params);
+
+         return true;
+      } catch (e) {
+         return e;
+      }
+
+   }
+
+
+
+   /**
+    * Returns true if the course was successfully deleted.
+    * @param {Number} course_id The course's ID number (integer).
+    * @param {Number} user_id The given user's ID number (integer).
+    * @returns {Promise} Resolves with true if the course was successfully deleted.
+    *    rejects otherwise.
+    */
+   async delete(course_id, user_id) {
+      const sql = "UPDATE courses " + "SET is_deleted = 1 " + "WHERE id = $course_id;";
+      const params = { $course_id: course_id };
+
+      try {
+         this.db.run(sql, params);
+
+         return true;
+      } catch (e) {
+         return e;
+      }
+
+   }
+
+
+
 
    /**
     * Returns all users associated with a course.
@@ -215,7 +344,7 @@ class CoursesDb {
                console.log(err);
                reject(err);
             }
-            else{
+            else {
                reject(false);
             }
          });
@@ -239,10 +368,10 @@ class CoursesDb {
             }
             else if (err !== null) {
                console.log(err);
-               reject(err); 
+               reject(err);
             }
             else {
-               reject(false); 
+               reject(false);
             }
          });
       });
@@ -311,34 +440,54 @@ class CoursesDb {
     * @param {Number} course_id The course's ID number (integer).
     * @param {Number} user_id The user's ID number (integer).
     * @param {Number} role Integer representing a role, specified by these bits: 
-    *    0001 = is pending user, 
-    *    0010 = can submit assignment,
-    *    0100 = can modify course,
-    *    1000 = can grade assignments
+    *    00001 = is pending user, 
+    *    00010 = can submit assignment,
+    *    00100 = can modify course,
+    *    01000 = can grade assignments,
+    *    10000 = is creator
     * @returns {Promise} Resolves with the number of rows affected if successful; 
     *    rejects with error otherwise. 
     */
-   setCourseRole(course_id, user_id, role){
-      const sql = "UPDATE course_users SET course_role = $role WHERE course_id = $course_id AND user_id = $user_id";
-      const params = { $course_id: course_id, $user_id: user_id, $role: role }
+   setCourseRole(course_id, user_id, role) {
 
-      return new Promise((resolve, reject) => {
+      // Prevent creator from being locked out of own course
+      const promise = this.isCreator(course_id, user_id)
+         .then(result => {
+            if (result && (role < 20)) {
+               throw "CANNOT REMOVE PRIVELEGES FROM COURSE OWNER";
+            }
+         })
+         .catch(err => {
+            role = 20;
+            console.log(err);
+         })
+         .then(() => {
 
-         //AC: placing db callback function into its own variable changes 
-         //*this* from local class object to result of sqlite3 db call.
-         var local_callback = function (err) {
-            if (err === null) {
-               resolve(this.changes);
-               return;
-            }
-            else {
-               console.log(err);
-               reject(err);
-               return;
-            }
-         };
-         this.db.run(sql, params, local_callback);
-      });
+
+            const sql = "UPDATE course_users SET course_role = $role WHERE course_id = $course_id AND user_id = $user_id";
+            const params = { $course_id: course_id, $user_id: user_id, $role: role }
+
+            return new Promise((resolve, reject) => {
+
+               //AC: placing db callback function into its own variable changes 
+               //*this* from local class object to result of sqlite3 db call.
+               var local_callback = function (err) {
+                  if (err === null) {
+                     resolve(this.changes);
+                     return;
+                  }
+                  else {
+                     console.log(err);
+                     reject(err);
+                     return;
+                  }
+               };
+               this.db.run(sql, params, local_callback);
+            });
+         })
+         .catch(console.log);
+
+      return promise;
    }
 }
 

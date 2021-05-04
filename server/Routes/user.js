@@ -106,6 +106,8 @@ exports.logout = function(req, res) {
       .then(user => validateUser(user, db))
       .then(user => db.Users.userRow(user.login))
       .then(user => {
+         //user.id = 2;         // MODIFY WHICH USER IS LOGGED IN 
+         //console.log(user.id);
          req.session.user = user; 
          res.redirect(clientUrl + 'account/login');
       })
