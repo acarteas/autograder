@@ -1,0 +1,15 @@
+{
+    "name": "data",
+    "version": "0.1.0",
+    "description": "",
+    "main": "data.js",
+    "scripts": {
+      "start": "node DBCopy.js"
+    },
+    "author": "Adam Carter",
+    "license": "ISC",
+    "dependencies": {
+    },
+    "devDependencies": {
+    }
+  }
