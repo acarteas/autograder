@@ -50,7 +50,7 @@ class CourseAssignmentSelectorView extends Component {
 
             if (this.state.initial_assignment > -1) {
                for (let i=0; i<assignments.length; i++) {
-                  if (assignments[i].id == this.state.initial_assignment) {
+                  if (parseInt(assignments[i].id) === parseInt(this.state.initial_assignment)) {
                      select = i;
                      break;
                   }
