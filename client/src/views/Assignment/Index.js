@@ -91,6 +91,8 @@ class IndexView extends Component {
       });
    }
 
+   
+
    getCourseUsers() {
       let self = this;
       this.props.models.course.getCourseUsers(this.state.current_assignment.course_id)
@@ -243,17 +245,23 @@ class IndexView extends Component {
       const links = this.state.links;
       const state = this.state;
       const self = this;
+      const current_path = this.props.location.pathname; 
+      
+      let initial_assignment;
+      
+      if (current_path.search(/\d/) > 0) {
+         initial_assignment = current_path.substring(current_path.search(/\d/));
+         console.log(initial_assignment);
 
-      //always start out at the file upload component
-      if (this.props.location.pathname.toLowerCase() === '/assignment/' || this.props.location.pathname.toLowerCase() === '/assignment') {
-         return (<Redirect to="/assignment/add-files" />)
       }
+
+      
       return (
          <div>
+            <Redirect to="/assignment/add-files" />
             <article className="row">
-
                <CourseAssignmentSelector
-                  onAssignmentChange={this.onAssignmentChange} class_name="col-md-3" />
+                  onAssignmentChange={this.onAssignmentChange} initial_assignment={initial_assignment} class_name="col-md-3" />
                <div className="col-md-3">
                   {this.renderStudentSelector()}
                </div>

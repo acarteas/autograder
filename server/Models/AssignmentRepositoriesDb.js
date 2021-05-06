@@ -96,9 +96,9 @@ class AssignmentRepositoriesDb {
 
 
 
-   isUnique(url) {
-      const sql = "SELECT * FROM assignment_repositories WHERE url = $url";
-      const params = {$url: url};
+   isUnique(user_id, assignment_id) {
+      const sql = "SELECT * FROM assignment_repositories WHERE user_id = $user_id AND assignment_id = $assignment_id";
+      const params = {$user_id: user_id, $assignment_id: assignment_id};
       return new Promise((resolve, reject) => {
          this.db.get(sql, params, (err, row) => {
             if (err === null && row !== undefined) {
